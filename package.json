@@ -1,4 +1,19 @@
 {
+  "name": "e-wallet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate-up": "npx sequelize db:migrate",
+    "migrate-down": "npx sequelize db:migrate:undo:all",
+    "seed-up": "npx sequelize db:seed:all",
+    "seed-down": "npx sequelize db:seed:undo:all",
+    "dev": "nodemon src/server.js"
+  },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
@@ -13,5 +28,8 @@
     "nodemon": "^3.0.3",
     "sequelize": "^6.35.2",
     "sequelize-cli": "^6.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }
