@@ -35,7 +35,7 @@ const logger = morgan("dev");
 app.use(logger);
 
 // custom logger middleware
-// app.use(customLogger);
+app.use(customLogger);
 
 // incoming request parser
 app.use(express.json());

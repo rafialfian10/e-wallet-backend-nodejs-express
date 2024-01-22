@@ -37,9 +37,9 @@ exports.validateCreateUserRequest = (userData) => {
       .string()
       .regex(/^\d{10,13}$/)
       .required(),
+    roleId: joi.number(),
     // gender: joi.string().required(),
     // address: joi.string().required(),
-    roleId: joi.number(),
   });
 
   try {
@@ -55,11 +55,12 @@ exports.validateCreateUserRequest = (userData) => {
 
 exports.validateUpdateUserRequest = (userData) => {
   const schema = joi.object({
-    fullname: joi.string(),
+    username: joi.string(),
     email: joi.string().email(),
-    phone: joi.string(),
-    address: joi.string(),
     password: joi.string(),
+    phone: joi.string(),
+    gender: joi.string(),
+    address: joi.string(),
     roleId: joi.number(),
   });
 

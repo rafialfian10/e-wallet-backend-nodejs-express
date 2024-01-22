@@ -7,7 +7,7 @@ exports.sendVerificationEmail = async (user, token) => {
     // send mail with defined transport object
     response.data = await transporter.sendMail({
       from: process.env.SENDER_NAME,
-      to: user.email, 
+      to: user.email,
       subject: "Email Verification", // Subject line
       text: "Hello world?", // plain text body
       html: `<!DOCTYPE html>
@@ -223,7 +223,7 @@ exports.sendVerificationEmail = async (user, token) => {
       </table>
     </body>
   </html>
-  `, 
+  `,
     });
   } catch (error) {
     response.error = error.message;

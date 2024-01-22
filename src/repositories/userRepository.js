@@ -47,7 +47,6 @@ exports.getUser = async (userId) => {
 };
 
 exports.createUser = async (user) => {
-  console.log("params", user);
   const response = { data: null, error: null };
 
   try {
@@ -66,8 +65,6 @@ exports.createUser = async (user) => {
   } catch (error) {
     response.error = `error on create data : ${error.message}`;
   }
-
-  console.log("response", response);
 
   return response;
 };

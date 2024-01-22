@@ -58,14 +58,12 @@ module.exports = async (req, res) => {
       throw error;
     }
 
-    console.log("solve berhasil", user);
-
     // generate otp code
     const otp = otpCodeGenerator(4);
     const hashedOtp = await hashPassword(otp, 11);
 
     // store hashed otp in redis for 5 minutes
-    // setRedisValue(user.email, hashedOtp, 5 * 60);
+    setRedisValue(user.email, hashedOtp, 5 * 60);
 
     // send otp code to email
     sendVerificationEmail(user, otp);
@@ -84,7 +82,7 @@ module.exports = async (req, res) => {
     successResponse({
       res: res,
       status: httpStatus.CREATED,
-      data: singleUserResponse(userRegistered),
+      data: userRegistered,
     });
   } catch (error) {
     // send error response
