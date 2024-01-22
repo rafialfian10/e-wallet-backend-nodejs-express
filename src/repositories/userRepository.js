@@ -47,6 +47,7 @@ exports.getUser = async (userId) => {
 };
 
 exports.createUser = async (user) => {
+  console.log("params", user);
   const response = { data: null, error: null };
 
   try {

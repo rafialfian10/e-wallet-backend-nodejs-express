@@ -4,8 +4,8 @@ const cors = require("cors");
 
 const path = require("path");
 const router = require("./routes");
+const { redisInit } = require("../config/redis");
 const customLogger = require("./pkg/middlewares/logger");
-// const { redisInit } = require("../config/redis");
 
 require("dotenv").config(); // read environment variable from .env file
 // -----------------------------------------

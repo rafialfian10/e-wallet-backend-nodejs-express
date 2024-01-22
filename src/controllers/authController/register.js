@@ -3,7 +3,7 @@ const httpStatus = require("http-status");
 const { hashPassword } = require("../../pkg/helpers/bcrypt");
 const { otpCodeGenerator } = require("../../pkg/helpers/otpCodeGenerator");
 const { sendVerificationEmail } = require("../../pkg/helpers/sendMail");
-// const { setRedisValue } = require("../../pkg/helpers/redis");
+const { setRedisValue } = require("../../pkg/helpers/redis");
 
 const { successResponse, errorResponse } = require("../../serializers/responseSerializer");
 const { singleUserResponse, validateCreateUserRequest } = require("../../serializers/userSerializer");
@@ -12,6 +12,7 @@ const { getUser, createUser, getUserByEmailAndPhone } = require("../../repositor
 
 module.exports = async (req, res) => {
   try {
+    // get new user data from req body
     const newUser = {
       username: req.body.username,
       email: req.body.email,
@@ -31,7 +32,7 @@ module.exports = async (req, res) => {
     } else if (req.userData?.roleId == 1) {
       newUser.roleId = req.body.roleId;
     }
-    
+
     // validate the new user
     const error = validateCreateUserRequest(newUser);
     if (error) {
@@ -41,9 +42,9 @@ module.exports = async (req, res) => {
     }
 
     // check is email/phone already used by another user
-    const { error: errorgetUserByEmailAndPhone } =
+    const { error: errorGetUserByEmailAndPhone } =
       await getUserByEmailAndPhone(newUser.email, newUser.phone);
-    if (!errorgetUserByEmailAndPhone) {
+    if (!errorGetUserByEmailAndPhone) {
       const error = new Error("Email or Phone already used by another user");
       error.status = httpStatus.BAD_REQUEST;
       throw error;
@@ -57,7 +58,7 @@ module.exports = async (req, res) => {
       throw error;
     }
 
-    console.log("soeg sekali", user);
+    console.log("solve berhasil", user);
 
     // generate otp code
     const otp = otpCodeGenerator(4);
@@ -73,12 +74,11 @@ module.exports = async (req, res) => {
     const { data: userRegistered, error: errorGetUser } = await getUser(
       user.id
     );
-
     if (errorGetUser) {
       const errors = new Error(errorGetUser);
       errors.status = httpStatus.NOT_FOUND;
       throw errors;
-    };
+    }
 
     // send success response
     successResponse({
@@ -90,7 +90,7 @@ module.exports = async (req, res) => {
     // send error response
     errorResponse({
       res: res,
-      error: error.message,
+      error: error,
     });
   }
 };
