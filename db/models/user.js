@@ -2,7 +2,7 @@
 const { Model } = require("sequelize");
 const bcrypt = require("bcrypt");
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Users extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -10,57 +10,59 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-    //   User.hasMany(models.Todo, {
-    //     foreignKey: "userId",
-    //     as: {
-    //       // untuk object key ketika mempreload todo di data user
-    //       singular: "todo",
-    //       plural: "todos",
-    //     },
-    //   });
-    //   User.hasMany(models.Category, {
-    //     foreignKey: "userId",
-    //     as: {
-    //       // untuk object key ketika mempreload category di data user
-    //       singular: "category",
-    //       plural: "categories",
-    //     },
-    //   });
+      this.belongsTo(models.Roles, {
+        foreignKey: "roleId",
+        as: "role",
+      });
     }
   }
-  User.init(
+  Users.init(
     {
-      userName: {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+        allowNull: false,
+      },
+      username: {
         type: DataTypes.STRING,
       },
       email: {
         type: DataTypes.STRING,
-      },
-      password: {
-        type: DataTypes.STRING,
-        set(value) {
-          this.setDataValue("password", bcrypt.hashSync(value, 10));
-        },
-      },
-      phone: {
-        type: DataTypes.STRING,
-      },
-      address: {
-        type: DataTypes.STRING,
-      },
-      photo: {
-        type: DataTypes.STRING,
+        unique: true,
       },
       isEmailVerified: {
         type: DataTypes.BOOLEAN,
       },
+      password: {
+        type: DataTypes.STRING,
+      },
+      phone: {
+        type: DataTypes.STRING,
+        unique: true,
+      },
+      isPhoneVerified: {
+        type: DataTypes.BOOLEAN,
+      },
+      gender: {
+        type: DataTypes.STRING,
+      },
+      address: {
+        type: DataTypes.TEXT,
+      },
+      photo: {
+        type: DataTypes.STRING,
+      },
+      roleId: {
+        type: DataTypes.INTEGER,
+      } ,
     },
     {
       sequelize,
-      modelName: "User",
+      modelName: "Users",
       underscored: true,
       paranoid: true,
     }
   );
-  return User;
+  return Users;
 };
