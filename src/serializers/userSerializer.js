@@ -1,8 +1,7 @@
 const joi = require("joi");
-
-const { Users } = require("../../db/models");
 const { singleRoleResponse } = require("./roleSerializer");
-// -------------------------------------------------------------
+const { Users } = require("../../db/models");
+// --------------------------------------------------------------
 
 exports.singleUserResponse = (userData) => {
   const user =
@@ -12,10 +11,11 @@ exports.singleUserResponse = (userData) => {
     id: user.id,
     username: user.username,
     email: user.email,
-    gender: user.gender,
-    address: user.address,
+    isEmailVerified: user.isEmailVerified,
     phone: user.phone,
     isPhoneVerified: user.isPhoneVerified,
+    gender: user.gender,
+    address: user.address,
     photo: user.photo,
     role: singleRoleResponse(user.role),
   };
@@ -32,12 +32,12 @@ exports.validateCreateUserRequest = (userData) => {
     username: joi.string().required(),
     email: joi.string().email().required(),
     password: joi.string().required(),
-    gender: joi.string().required(),
-    address: joi.string().required(),
     phone: joi
       .string()
       .regex(/^\d{10,13}$/)
       .required(),
+    gender: joi.string().required(),
+    address: joi.string().required(),
     roleId: joi.number(),
   });
 
@@ -54,12 +54,11 @@ exports.validateCreateUserRequest = (userData) => {
 
 exports.validateUpdateUserRequest = (userData) => {
   const schema = joi.object({
-    username: joi.string(),
+    fullname: joi.string(),
     email: joi.string().email(),
-    password: joi.string(),
-    gender: joi.string(),
-    address: joi.string(),
     phone: joi.string(),
+    address: joi.string(),
+    password: joi.string(),
     roleId: joi.number(),
   });
 

@@ -1,24 +1,19 @@
 const httpStatus = require("http-status");
-const { getUser, createUser, findUserByEmailAndPhone } = require("../../repositories/userRepository");
-const {
-  singleUserResponse,
-  validateCreateUserRequest,
-} = require("../../serializers/userSerializer");
-const {
-  successResponse,
-  errorResponse,
-} = require("../../serializers/responseSerializer");
+
 const { hashPassword } = require("../../pkg/helpers/bcrypt");
-const otpCodeGenerator = require("../../pkg/helpers/otpCodeGenerator");
+const { otpCodeGenerator } = require("../../pkg/helpers/otpCodeGenerator");
 const { sendVerificationEmail } = require("../../pkg/helpers/sendMail");
 const { setRedisValue } = require("../../pkg/helpers/redis");
+
+const { successResponse, errorResponse } = require("../../serializers/responseSerializer");
+const { singleUserResponse, validateCreateUserRequest } = require("../../serializers/userSerializer");
+const { getUser, createUser, findUserByEmailAndPhone } = require("../../repositories/userRepository");
 // -------------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {
-    // get new user data from req body
     const newUser = {
-      fullname: req.body.fullname,
+      username: req.body.username,
       email: req.body.email,
       phone: req.body.phone,
       address: req.body.address,
