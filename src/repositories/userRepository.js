@@ -53,17 +53,20 @@ exports.createUser = async (user) => {
     response.data = await Users.create({
       username: user.username,
       email: user.email,
+      isEmailVerified: false,
       password: user.password,
-      gender: user.gender,
-      address: user.address,
       phone: user.phone,
       isPhoneVerified: false,
+      gender: user.gender,
+      address: user.address,
       photo: user.photo,
       roleId: user.roleId,
     });
   } catch (error) {
     response.error = `error on create data : ${error.message}`;
   }
+
+  console.log("response", response);
 
   return response;
 };

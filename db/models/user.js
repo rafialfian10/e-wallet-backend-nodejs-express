@@ -1,6 +1,6 @@
 "use strict";
 const { Model } = require("sequelize");
-const bcrypt = require("bcrypt");
+
 module.exports = (sequelize, DataTypes) => {
   class Users extends Model {
     /**
@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsTo(models.Roles, {
+      // parent
+      this.belongsTo(models.Users, {
         foreignKey: "roleId",
         as: "role",
       });
@@ -24,38 +25,22 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         allowNull: false,
       },
-      username: {
-        type: DataTypes.STRING,
-      },
+      username: DataTypes.STRING,
       email: {
         type: DataTypes.STRING,
         unique: true,
       },
-      isEmailVerified: {
-        type: DataTypes.BOOLEAN,
-      },
-      password: {
-        type: DataTypes.STRING,
-      },
+      isEmailVerified: DataTypes.BOOLEAN,
+      password: DataTypes.STRING,
       phone: {
         type: DataTypes.STRING,
         unique: true,
       },
-      isPhoneVerified: {
-        type: DataTypes.BOOLEAN,
-      },
-      gender: {
-        type: DataTypes.STRING,
-      },
-      address: {
-        type: DataTypes.TEXT,
-      },
-      photo: {
-        type: DataTypes.STRING,
-      },
-      roleId: {
-        type: DataTypes.INTEGER,
-      } ,
+      isPhoneVerified: DataTypes.BOOLEAN,
+      gender: DataTypes.STRING,
+      address: DataTypes.TEXT,
+      photo: DataTypes.STRING,
+      roleId: DataTypes.INTEGER,
     },
     {
       sequelize,

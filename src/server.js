@@ -4,9 +4,8 @@ const cors = require("cors");
 
 const path = require("path");
 const router = require("./routes");
-
 const customLogger = require("./pkg/middlewares/logger");
-const { redisInit } = require("../config/redis");
+// const { redisInit } = require("../config/redis");
 
 require("dotenv").config(); // read environment variable from .env file
 // -----------------------------------------
@@ -29,14 +28,14 @@ app.use(
 );
 
 // connect to redis server
-redisInit();
+// redisInit();
 
 // create logger instance
 const logger = morgan("dev");
 app.use(logger);
 
 // custom logger middleware
-app.use(customLogger);
+// app.use(customLogger);
 
 // incoming request parser
 app.use(express.json());

@@ -102,7 +102,7 @@ exports.sendVerificationEmail = async (user, token) => {
                             line-height: 24px;
                           "
                         >
-                          Hello <b>${user.fullname}</b>,
+                          Hello <b>${user.username}</b>,
                         </p>
                         <br />
                         <p

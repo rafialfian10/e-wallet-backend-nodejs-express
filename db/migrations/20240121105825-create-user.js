@@ -45,19 +45,19 @@ module.exports = {
           key: "id",
         },
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
-        field: "created_at",
+        defaultValue: new Date(),
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
-        field: "updated_at",
+        defaultValue: new Date(),
       },
-      deletedAt: {
+      deleted_at: {
+        allowNull: true,
         type: Sequelize.DATE,
-        field: "deleted_at",
       },
     });
   },

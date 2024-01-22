@@ -1,4 +1,5 @@
 const joi = require("joi");
+
 const { singleRoleResponse } = require("./roleSerializer");
 const { Users } = require("../../db/models");
 // --------------------------------------------------------------
@@ -36,8 +37,8 @@ exports.validateCreateUserRequest = (userData) => {
       .string()
       .regex(/^\d{10,13}$/)
       .required(),
-    gender: joi.string().required(),
-    address: joi.string().required(),
+    // gender: joi.string().required(),
+    // address: joi.string().required(),
     roleId: joi.number(),
   });
 
