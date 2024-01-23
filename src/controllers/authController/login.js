@@ -2,9 +2,12 @@
 const httpStatus = require("http-status");
 const jwt = require("jsonwebtoken");
 
-const { getUserByEmail } = require("../../repositories/userRepository");
+const { getUserByEmailAndPhone } = require("../../repositories/userRepository");
 const { validateLoginRequest } = require("../../serializers/userSerializer");
-const { successResponse, errorResponse, } = require("../../serializers/responseSerializer");
+const {
+  successResponse,
+  errorResponse,
+} = require("../../serializers/responseSerializer");
 const { comparePassword } = require("../../pkg/helpers/bcrypt");
 // ---------------------------------------------------------------------
 
@@ -22,8 +25,9 @@ module.exports = async (req, res) => {
       throw errors;
     }
 
-    const { data: user, error: errorFindUser } = await getUserByEmail(
+    const { data: user, error: errorFindUser } = await getUserByEmailAndPhone(
       loginRequest.email,
+      null
     );
 
     if (!user) {

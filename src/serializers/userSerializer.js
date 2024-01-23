@@ -1,7 +1,7 @@
 const joi = require("joi");
 
-const { singleRoleResponse } = require("./roleSerializer");
 const { Users } = require("../../db/models");
+const { singleRoleResponse } = require("./roleSerializer");
 // --------------------------------------------------------------
 
 exports.singleUserResponse = (userData) => {

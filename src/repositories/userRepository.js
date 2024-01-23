@@ -110,27 +110,6 @@ exports.deleteUser = async (user) => {
   return response;
 };
 
-exports.getUserByEmail = async (email) => {
-  const response = { data: null, error: null };
-
-  try {
-    response.data = await Users.findOne({
-      where: {
-        [Op.or]: [email && { email: email }],
-      },
-      include: [{ model: Roles, as: "role" }],
-    });
-
-    if (!response.data) {
-      throw new Error(`user not found`);
-    }
-  } catch (error) {
-    response.error = `error on get data : ${error.message}`;
-  }
-
-  return response;
-};
-
 exports.getUserByEmailAndPhone = async (email, phone) => {
   const response = { data: null, error: null };
 

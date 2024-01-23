@@ -1,16 +1,16 @@
 const httpStatus = require("http-status");
 
-const { getUser } = require("../../repositories/userRepository");
+const { getBalance } = require("../../repositories/balanceRepository");
 const {
   successResponse,
   errorResponse,
 } = require("../../serializers/responseSerializer");
-const { singleUserResponse } = require("../../serializers/userSerializer");
+const { singleBalanceResponse } = require("../../serializers/balanceSerializer");
 // --------------------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {
-    const { data: user, error } = await getUser(req.params.id);
+    const { data: balance, error } = await getBalance(req.params.id);
     if (error) {
       const errors = new Error(error);
       errors.status = httpStatus.NOT_FOUND;
@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
-      data: singleUserResponse(user),
+      data: singleBalanceResponse(balance),
     });
   } catch (error) {
     errorResponse({

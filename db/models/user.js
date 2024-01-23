@@ -14,6 +14,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "roleId",
         as: "role",
       });
+
+      this.hasMany(models.Balances, {
+        foreignKey: "userId",
+        as: {
+          singular: "balance",
+          plural: "balances",
+        },
+      });
     }
   }
   Users.init(
