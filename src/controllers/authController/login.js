@@ -1,64 +1,73 @@
-const status = require("http-status");
-const bcrypt = require("bcrypt");
+"use-strict";
+const httpStatus = require("http-status");
 const jwt = require("jsonwebtoken");
 
-const { Users } = require("../../../db/models");
-// ----------------------------------------------
+const { getUserByEmail } = require("../../repositories/userRepository");
+const { validateLoginRequest } = require("../../serializers/userSerializer");
+const { successResponse, errorResponse, } = require("../../serializers/responseSerializer");
+const { comparePassword } = require("../../pkg/helpers/bcrypt");
+// ---------------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const loginRequest = {
+      email: req.body.email,
+      password: req.body.password,
+    };
 
-    const user = await Users.findOne({
-      where: { email },
-      attributes: {
-        exclude: ["createdAt", "updatedAt"],
-      },
-    });
+    const error = validateLoginRequest(loginRequest);
+    if (error) {
+      const errors = new Error(error);
+      errors.status = httpStatus.BAD_REQUEST;
+      throw errors;
+    }
+
+    const { data: user, error: errorFindUser } = await getUserByEmail(
+      loginRequest.email,
+    );
 
     if (!user) {
-      return res.status(status.BAD_REQUEST).json({
-        message: "email not registered",
-        status: status.BAD_REQUEST,
-      });
+      const error = new Error(errorFindUser);
+      error.status = httpStatus.NOT_FOUND;
+      throw error;
     }
 
-    const checkPassword = await bcrypt.compare(password, user.password);
-    if (!checkPassword) {
-      return res.status(status.BAD_REQUEST).json({
-        message: "password you entered is incorrect",
-        status: status.BAD_REQUEST,
-        errorType: "incorrect_password",
-      });
+    const isMatch = await comparePassword(user.password, loginRequest.password);
+    if (!isMatch) {
+      const error = new Error("Wrong password");
+      error.status = httpStatus.BAD_REQUEST;
+      throw error;
     }
+
+    // if (user.isEmailVerified === false) {
+    //   const error = new Error("Email has not been verified");
+    //   error.status = httpStatus.BAD_REQUEST;
+    //   throw error;
+    // }
 
     const token = jwt.sign(
       {
         id: user.id,
         username: user.username,
         email: user.email,
+        roleId: user.roleId,
       },
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "24 hours",
+        issuer: "Rafi Alfian",
+      }
     );
 
-    res.status(status.OK).json({
-      message: "login successfully",
-      status: status.OK,
-      data: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        isEmailVerified: user.isEmailVerified,
-        phone: user.phone,
-        isPhoneVerified: user.isPhoneVerified,
-        gender: user.gender,
-        address: user.address,
-        photo: user.photo,
-        token,
-      },
+    successResponse({
+      response: res,
+      status: httpStatus.OK,
+      data: { id: user.id, token: token },
     });
-  } catch (err) {
-    console.log(err);
-    res.status(status.INTERNAL_SERVER_ERROR).json({ message: err.message });
+  } catch (error) {
+    errorResponse({
+      response: res,
+      error: error,
+    });
   }
 };

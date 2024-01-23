@@ -1,5 +1,7 @@
 const { Op } = require("sequelize");
+
 const { Users, Roles } = require("../../db/models");
+// ---------------------------------------------------------
 
 exports.getUsers = async (offset = 0, limit = 10, filter = {}) => {
   const response = { data: null, error: null, count: 0 };
@@ -9,8 +11,16 @@ exports.getUsers = async (offset = 0, limit = 10, filter = {}) => {
       offset: offset,
       limit: limit,
       where: filter,
-      include: [{ model: Roles, as: "role" }],
+      include: [
+        {
+          model: Roles,
+          as: "role",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
     });
+
     if (!response.data) {
       throw new Error("users data not found");
     }
@@ -33,7 +43,14 @@ exports.getUser = async (userId) => {
       where: {
         id: userId,
       },
-      include: [{ model: Roles, as: "role" }],
+      include: [
+        {
+          model: Roles,
+          as: "role",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
     });
 
     if (!response.data) {
@@ -88,6 +105,27 @@ exports.deleteUser = async (user) => {
     response.data = await user.destroy();
   } catch (error) {
     response.error = `error on delete data : ${error.message}`;
+  }
+
+  return response;
+};
+
+exports.getUserByEmail = async (email) => {
+  const response = { data: null, error: null };
+
+  try {
+    response.data = await Users.findOne({
+      where: {
+        [Op.or]: [email && { email: email }],
+      },
+      include: [{ model: Roles, as: "role" }],
+    });
+
+    if (!response.data) {
+      throw new Error(`user not found`);
+    }
+  } catch (error) {
+    response.error = `error on get data : ${error.message}`;
   }
 
   return response;

@@ -16,7 +16,6 @@ const { setRedisValue } = require("../../pkg/helpers/redis");
 
 module.exports = async (req, res) => {
   try {
-    // validate request data
     const error = validateResendOTPRequest(req.body);
     if (error) {
       const errors = new Error(error);

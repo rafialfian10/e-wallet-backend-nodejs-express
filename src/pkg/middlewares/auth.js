@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const status = require("http-status");
+// -------------------------------------------------
 
 exports.userAuth = async (req, res, next) => {
   try {
@@ -17,10 +18,10 @@ exports.userAuth = async (req, res, next) => {
     });
 
     next();
-  } catch (err) {
+  } catch (error) {
     res.status(status.UNAUTHORIZED).json({
       status: status.UNAUTHORIZED,
-      message: err.message,
+      message: error.message,
     });
   }
 };
@@ -37,16 +38,16 @@ exports.adminAuth = async (req, res, next) => {
       if (err) {
         throw err;
       } else if (payload.roleId !== 1 && payload.roleId !== 2) {
-        throw new Error("Your'e not allowed to access this");
+        throw new Error("Your'e not allowed to access this, only admin can access");
       }
       req.userData = payload;
     });
 
     next();
-  } catch (err) {
+  } catch (error) {
     res.status(status.UNAUTHORIZED).json({
       status: status.UNAUTHORIZED,
-      message: err.message,
+      message: error.message,
     });
   }
 };
@@ -63,16 +64,16 @@ exports.superAdminAuth = async (req, res, next) => {
       if (err) {
         throw err;
       } else if (payload.roleId !== 1) {
-        throw new Error("Your'e not allowed to access this");
+        throw new Error("Your'e not allowed to access this, only super admin can access");
       }
       req.userData = payload;
     });
 
     next();
-  } catch (err) {
+  } catch (error) {
     res.status(status.UNAUTHORIZED).json({
       status: status.UNAUTHORIZED,
-      message: err.message,
+      message: error.message,
     });
   }
 };

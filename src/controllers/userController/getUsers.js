@@ -1,30 +1,47 @@
-const status = require("http-status");
+const httpStatus = require("http-status");
 
-const { Users } = require("../../../db/models");
-// --------------------------------------------
+const { getUsers } = require("../../repositories/userRepository");
+const { multipleUserResponse } = require("../../serializers/userSerializer");
+const {
+  successResponse,
+  errorResponse,
+} = require("../../serializers/responseSerializer");
+// -------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {
-    const users = await Users.findAll({
-      attributes: {
-        exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
-      },
-    });
+    let offset, limit;
 
-    let dataUsers = JSON.parse(JSON.stringify(users));
+    if (req.query.page) {
+      // default limit = 10
+      limit = req.query.limit ? parseInt(req.query.limit) : 10;
+      offset = req.query.page == 1 ? 0 : (parseInt(req.query.page) - 1) * limit;
+    }
 
-    dataUsers = dataUsers.map((dataUser) => {
-      return {
-        ...dataUser,
-        photo: process.env.PATH_FILE_PHOTO + dataUser.photo,
-      };
-    });
+    const {
+      data: users,
+      count: totalUser,
+      error,
+    } = await getUsers(offset, limit);
+    if (error) {
+      const errors = new Error(error);
+      errors.status = httpStatus.NOT_FOUND;
+      throw errors;
+    }
 
-    res.status(status.OK).json({
-      status: status.OK,
-      data: dataUsers,
+    successResponse({
+      response: res,
+      status: httpStatus.OK,
+      data: multipleUserResponse(users),
+      totalData: totalUser,
+      page: req.query.page,
+      limit: limit,
     });
-  } catch (err) {
-    res.status(status.BAD_REQUEST).json({ message: err.message });
+  } catch (error) {
+    errorResponse({
+      response: res,
+      error: error,
+    });
   }
 };
+

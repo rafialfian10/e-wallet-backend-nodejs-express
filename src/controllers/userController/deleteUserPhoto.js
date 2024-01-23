@@ -1,15 +1,20 @@
-const status = require("http-status");
+const httpStatus = require("http-status");
 
-const { Users } = require("../../../db/models");
-// --------------------------------------------
+const { getUser } = require("../../repositories/userRepository");
+const { singleUserResponse } = require("../../serializers/userSerializer");
+const {
+  successResponse,
+  errorResponse,
+} = require("../../serializers/responseSerializer");
+// -----------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {
-    const userId = req.params.id;
-
-    const user = await Users.findByPk(userId);
-    if (!user) {
-      return res.status(status.NOT_FOUND).json({ message: "user not found" });
+    const { data: user, error } = await getUser(req.params.id);
+    if (error) {
+      const errors = new Error(error);
+      errors.status = httpStatus.NOT_FOUND;
+      throw errors;
     }
 
     if (user.photo) {
@@ -17,11 +22,15 @@ module.exports = async (req, res) => {
       await user.save();
     }
 
-    res.status(status.OK).json({
-      status: status.OK,
-      message: `photo for user with id ${userId} has been deleted`,
+    successResponse({
+      response: res,
+      status: httpStatus.OK,
+      data: singleUserResponse(user),
     });
   } catch (error) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({ message: error.message });
+    errorResponse({
+      response: res,
+      error: error,
+    });
   }
 };

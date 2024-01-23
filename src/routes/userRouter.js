@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
 const userController = require("../controllers/userController");
-const { uploadSingleImage } = require("../pkg/middlewares/uploadFile");
+const { uploadPhoto } = require("../pkg/middlewares/uploadFile");
 const {
   superAdminAuth,
   adminAuth,
@@ -11,12 +11,7 @@ const {
 
 router.get("/users", adminAuth, userController.getUsers);
 router.get("/user/:id", userAuth, userController.getUser);
-router.patch(
-  "/user/:id",
-  userAuth,
-  uploadSingleImage,
-  userController.updateUser
-);
+router.patch("/user/:id", userAuth, uploadPhoto, userController.updateUser );
 router.delete("/user/:id", superAdminAuth, userController.deleteUser);
 router.delete("/user/:id/photo", userAuth, userController.deleteUserPhoto);
 

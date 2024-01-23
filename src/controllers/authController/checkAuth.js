@@ -1,40 +1,31 @@
-const status = require("http-status");
+const httpStatus = require("http-status");
 
-const { Users } = require("../../../db/models");
-// ----------------------------------------------
+const { getUser } = require("../../repositories/userRepository");
+const { singleUserResponse } = require("../../serializers/userSerializer");
+const {
+  successResponse,
+  errorResponse,
+} = require("../../serializers/responseSerializer");
+// -------------------------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {
-    const id = req.userData.id;
-
-    const userCheckAuth = await Users.findOne({
-      where: {
-        id,
-      },
-      attributes: {
-        exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
-      },
-    });
-
-    if (!userCheckAuth) {
-      return res.status(404).send({
-        status: "failed",
-      });
+    const { data: user } = await getUser(req.userData.id);
+    if (!user) {
+      const error = new Error("User not found");
+      error.status = httpStatus.NOT_FOUND;
+      throw error;
     }
 
-    res.status(status.OK).json({
-      status: status.OK,
-      data: {
-        id: userCheckAuth.id,
-        username: userCheckAuth.username,
-        email: userCheckAuth.email,
-        phone: userCheckAuth.phone,
-        gender: userCheckAuth.gender,
-        address: userCheckAuth.address,
-        photo: process.env.PATH_FILE_PHOTO + userCheckAuth.photo,
-      },
+    successResponse({
+      response: res,
+      status: httpStatus.OK,
+      data: singleUserResponse(user),
     });
   } catch (error) {
-    res.status(status.INTERNAL_SERVER_ERROR).json({ message: err.message });
+    errorResponse({
+      response: res,
+      error: error,
+    });
   }
 };

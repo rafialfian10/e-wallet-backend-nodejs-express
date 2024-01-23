@@ -3,16 +3,25 @@ const httpStatus = require("http-status");
 const { hashPassword } = require("../../pkg/helpers/bcrypt");
 const { otpCodeGenerator } = require("../../pkg/helpers/otpCodeGenerator");
 const { sendVerificationEmail } = require("../../pkg/helpers/sendMail");
-const { setRedisValue } = require("../../pkg/helpers/redis");
+// const { setRedisValue } = require("../../pkg/helpers/redis");
 
-const { successResponse, errorResponse } = require("../../serializers/responseSerializer");
-const { singleUserResponse, validateCreateUserRequest } = require("../../serializers/userSerializer");
-const { getUser, createUser, getUserByEmailAndPhone } = require("../../repositories/userRepository");
+const {
+  successResponse,
+  errorResponse,
+} = require("../../serializers/responseSerializer");
+const {
+  singleUserResponse,
+  validateCreateUserRequest,
+} = require("../../serializers/userSerializer");
+const {
+  getUser,
+  createUser,
+  getUserByEmailAndPhone,
+} = require("../../repositories/userRepository");
 // -------------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {
-    // get new user data from req body
     const newUser = {
       username: req.body.username,
       email: req.body.email,
@@ -33,7 +42,6 @@ module.exports = async (req, res) => {
       newUser.roleId = req.body.roleId;
     }
 
-    // validate the new user
     const error = validateCreateUserRequest(newUser);
     if (error) {
       const errors = new Error(error);
@@ -42,15 +50,16 @@ module.exports = async (req, res) => {
     }
 
     // check is email/phone already used by another user
-    const { error: errorGetUserByEmailAndPhone } =
-      await getUserByEmailAndPhone(newUser.email, newUser.phone);
+    const { error: errorGetUserByEmailAndPhone } = await getUserByEmailAndPhone(
+      newUser.email,
+      newUser.phone
+    );
     if (!errorGetUserByEmailAndPhone) {
       const error = new Error("Email or Phone already used by another user");
       error.status = httpStatus.BAD_REQUEST;
       throw error;
     }
 
-    // send new user to database
     const { data: user, error: errorCreateNewUser } = await createUser(newUser);
     if (errorCreateNewUser) {
       const error = new Error(errorCreateNewUser);
@@ -63,31 +72,29 @@ module.exports = async (req, res) => {
     const hashedOtp = await hashPassword(otp, 11);
 
     // store hashed otp in redis for 5 minutes
-    setRedisValue(user.email, hashedOtp, 5 * 60);
+    // setRedisValue(user.email, hashedOtp, 5 * 60);
 
     // send otp code to email
     sendVerificationEmail(user, otp);
 
-    // get user by id
     const { data: userRegistered, error: errorGetUser } = await getUser(
       user.id
     );
+
     if (errorGetUser) {
       const errors = new Error(errorGetUser);
       errors.status = httpStatus.NOT_FOUND;
       throw errors;
     }
 
-    // send success response
     successResponse({
-      res: res,
+      response: res,
       status: httpStatus.CREATED,
       data: userRegistered,
     });
   } catch (error) {
-    // send error response
     errorResponse({
-      res: res,
+      response: res,
       error: error,
     });
   }

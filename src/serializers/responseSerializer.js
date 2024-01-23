@@ -2,14 +2,14 @@ const httpStatus = require("http-status");
 // ----------------------------------------------
 
 exports.successResponse = ({
-  res,
+  response,
   status,
   data,
   totalData,
   limit = 10,
   page,
 }) => {
-  res.status(status || httpStatus.OK).json({
+  response.status(status || httpStatus.OK).json({
     status: status || httpStatus.OK,
     message: "OK",
     totalData: totalData,
@@ -19,8 +19,8 @@ exports.successResponse = ({
   });
 };
 
-exports.errorResponse = ({ res, error }) => {
-  res.status(error.status || httpStatus.INTERNAL_SERVER_ERROR).json({
+exports.errorResponse = ({ response, error }) => {
+  response.status(error.status || httpStatus.INTERNAL_SERVER_ERROR).json({
     status: error.status || httpStatus.INTERNAL_SERVER_ERROR,
     message: error.message,
     data: null,
