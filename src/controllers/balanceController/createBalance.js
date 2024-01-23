@@ -16,9 +16,8 @@ const {
 module.exports = async (req, res) => {
   try {
     const balance = {
-      amount: req.body.amount,
-      date: req.body.date,
-      userId: req.body.UserData,
+      balance: req.body.balance,
+      userId: req.userData.id,
     };
 
     const error = validateCreateBalanceRequest(balance);

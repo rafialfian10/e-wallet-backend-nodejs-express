@@ -49,8 +49,7 @@ exports.createBalance = async (balance) => {
   try {
     response.data = await Balances.create({
       userId: balance.userId,
-      amount: balance.amount,
-      date: balance.date,
+      balance: balance.balance,
     });
   } catch (error) {
     response.error = `error on create data : ${error.message}`;

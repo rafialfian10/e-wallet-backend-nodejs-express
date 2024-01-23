@@ -6,12 +6,13 @@ const { singleUserResponse } = require("./userSerializer");
 
 exports.singleBalanceResponse = (balanceData) => {
   const balance =
-    balanceData instanceof Balances ? balanceData.get({ plain: true }) : balanceData;
+    balanceData instanceof Balances
+      ? balanceData.get({ plain: true })
+      : balanceData;
 
   return {
     id: balance.id,
-    amount: balance.amount,
-    date: balance.date,
+    balance: balance.balance,
     user: singleUserResponse(balance.user),
   };
 };
@@ -24,8 +25,7 @@ exports.multipleBalanceResponse = (balancesData) => {
 
 exports.validateCreateBalanceRequest = (balanceData) => {
   const schema = joi.object({
-    amount: joi.number().required(),
-    date: joi.date().iso().required(),
+    balance: joi.number().required(),
     userId: joi.string().required(),
   });
 
@@ -43,8 +43,7 @@ exports.validateCreateBalanceRequest = (balanceData) => {
 exports.validateUpdateBalanceRequest = (balanceData) => {
   const schema = joi.object({
     userId: joi.string(),
-    amount: joi.number(),
-    date: joi.date().iso(),
+    balance: joi.number(),
   });
 
   try {

@@ -10,8 +10,7 @@ const {
 
 router.get("/balances", adminAuth, balanceController.getBalances);
 router.get("/balance/:id", userAuth, balanceController.getBalance);
-router.post("/topup-balance", userAuth, balanceController.topupBalance );
-router.post("/transfer-balance", userAuth, balanceController.transferBalance );
+router.post("/balance", userAuth, balanceController.createBalance );
 router.patch("/balance/:id", superAdminAuth, balanceController.updateBalance );
 router.delete("/balance/:id", superAdminAuth, balanceController.deleteBalance);
 

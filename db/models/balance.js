@@ -21,11 +21,8 @@ module.exports = (sequelize, DataTypes) => {
       userId: {
         type: DataTypes.INTEGER,
       },
-      amount: {
+      balance: {
         type: DataTypes.INTEGER,
-      },
-      date: {
-        type: DataTypes.DATE,
       },
     },
     {

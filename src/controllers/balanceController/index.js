@@ -1,8 +1,7 @@
 module.exports = {
   getBalances: require("./getBalances"),
   getBalance: require("./getBalance"),
-  topupBalance: require("./topupBalance"),
-  transferBalance: require("./transferBalance"),
+  createBalance: require("./createBalance"),
   updateBalance: require("./updateBalance"),
   deleteBalance: require("./deleteBalance"),
 };
