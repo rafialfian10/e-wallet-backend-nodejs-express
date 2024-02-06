@@ -12,7 +12,6 @@ const {
   successResponse,
   errorResponse,
 } = require("../../serializers/responseSerializer");
-// --------------------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {
@@ -23,41 +22,32 @@ module.exports = async (req, res) => {
       throw errors;
     }
 
-    const { data: balance, error: errorFindBalance } = await getBalance(
+    const { data: balance, error: errorGetBalance } = await getBalance(
       req.params.id
     );
-    if (errorFindBalance) {
-      const errors = new Error(errorFindBalance);
+    if (errorGetBalance) {
+      const errors = new Error(errorGetBalance);
       errors.status = httpStatus.NOT_FOUND;
       throw errors;
     }
 
-    // update amount
+    // update balance
     if (
-      req.body.amount !== null &&
-      req.body.amount !== undefined &&
-      req.body.amount !== balance.amount
+      req.body.balance !== null &&
+      req.body.balance !== undefined &&
+      req.body.balance !== balance.balance
     ) {
-      balance.amount = req.body.amount;
+      balance.balance = req.body.balance;
     }
 
-     // update date
-     if (
-      req.body.date !== null &&
-      req.body.date !== undefined &&
-      req.body.date !== balance.date
-    ) {
-      balance.date = req.body.date;
-    }
-
-    const { error: errorOnUpdateteUser } = await updateBalance(user);
-    if (errorOnUpdateteUser) {
-      const errors = new Error(errorOnUpdateteUser);
+    const { error: errorOnUpdateteBalance } = await updateBalance(balance);
+    if (errorOnUpdateteBalance) {
+      const errors = new Error(errorOnUpdateteBalance);
       errors.status = httpStatus.INTERNAL_SERVER_ERROR;
       throw errors;
     }
 
-    const { data: userUpdated, errorGetbalance } = await getBalance(user.id);
+    const { data: balanceUpdated, errorGetbalance } = await getBalance(balance.id);
     if (errorGetbalance) {
       const errors = new Error(errorGetbalance);
       errors.status = httpStatus.NOT_FOUND;
@@ -67,7 +57,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
-      data: singleBalanceResponse(userUpdated),
+      data: singleBalanceResponse(balanceUpdated),
     });
   } catch (error) {
     errorResponse({

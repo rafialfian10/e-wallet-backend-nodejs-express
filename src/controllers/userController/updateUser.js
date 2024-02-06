@@ -14,7 +14,6 @@ const {
   errorResponse,
 } = require("../../serializers/responseSerializer");
 const { photoUrlGenerator}  = require("../../pkg/helpers/imgUrlGenerator");
-// --------------------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {

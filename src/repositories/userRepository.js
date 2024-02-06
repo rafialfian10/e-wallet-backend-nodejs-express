@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 
-const { Users, Roles } = require("../../db/models");
+const { Users, Roles, Balances } = require("../../db/models");
 // ---------------------------------------------------------
 
 exports.getUsers = async (offset = 0, limit = 10, filter = {}) => {
@@ -15,6 +15,11 @@ exports.getUsers = async (offset = 0, limit = 10, filter = {}) => {
         {
           model: Roles,
           as: "role",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+        {
+          model: Balances,
+          as: "balance",
           attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
         },
       ],
@@ -47,6 +52,11 @@ exports.getUser = async (userId) => {
         {
           model: Roles,
           as: "role",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+        {
+          model: Balances,
+          as: "balance",
           attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
         },
       ],

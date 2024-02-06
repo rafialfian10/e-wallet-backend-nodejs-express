@@ -18,7 +18,7 @@ const {
   createUser,
   getUserByEmailAndPhone,
 } = require("../../repositories/userRepository");
-// -------------------------------------------------------------------
+const { createBalance } = require("../../repositories/balanceRepository");
 
 module.exports = async (req, res) => {
   try {
@@ -60,9 +60,21 @@ module.exports = async (req, res) => {
       throw error;
     }
 
+    // create user
     const { data: user, error: errorCreateNewUser } = await createUser(newUser);
     if (errorCreateNewUser) {
       const error = new Error(errorCreateNewUser);
+      error.status = httpStatus.INTERNAL_SERVER_ERROR;
+      throw error;
+    }
+
+    // create balance
+    const { data: balance, error: errorCreateBalance } = await createBalance({
+      userId: user.id,
+      balance: 0,
+    });
+    if (errorCreateBalance) {
+      const error = new Error(errorCreateBalance);
       error.status = httpStatus.INTERNAL_SERVER_ERROR;
       throw error;
     }

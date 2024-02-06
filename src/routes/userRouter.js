@@ -7,7 +7,6 @@ const {
   adminAuth,
   userAuth,
 } = require("../pkg/middlewares/auth");
-// ------------------------------------------------------------------
 
 router.get("/users", adminAuth, userController.getUsers);
 router.get("/user/:id", userAuth, userController.getUser);

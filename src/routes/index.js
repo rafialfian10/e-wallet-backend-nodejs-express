@@ -2,7 +2,6 @@ const express = require("express");
 const authRouter = require("./authRouter");
 const userRouter = require("./userRouter");
 const balanceRouter = require("./balanceRouter");
-// ----------------------------------------------
 
 const router = express.Router();
 

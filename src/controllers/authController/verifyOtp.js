@@ -14,9 +14,7 @@ const {
 } = require("../../serializers/responseSerializer");
 const { getRedisValue } = require("../../pkg/helpers/redis");
 const { comparePassword } = require("../../pkg/helpers/bcrypt");
-// ------------------------------------------------------------------------
 
-// VERIFY EMAIL BY OTP
 module.exports = async (req, res) => {
   try {
     // validate request data

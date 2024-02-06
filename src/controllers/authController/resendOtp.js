@@ -12,7 +12,6 @@ const otpCodeGenerator = require("../../pkg/helpers/otpCodeGenerator");
 const { sendVerificationEmail } = require("../../pkg/helpers/sendMail");
 const { hashPassword } = require("../../pkg/helpers/bcrypt");
 const { setRedisValue } = require("../../pkg/helpers/redis");
-// ----------------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {

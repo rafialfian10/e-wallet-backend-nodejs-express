@@ -8,7 +8,6 @@ const { redisInit } = require("../config/redis");
 const customLogger = require("./pkg/middlewares/logger");
 
 require("dotenv").config(); // read environment variable from .env file
-// -----------------------------------------
 
 // create instance of express
 const app = express();

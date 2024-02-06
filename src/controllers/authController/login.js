@@ -9,7 +9,6 @@ const {
   errorResponse,
 } = require("../../serializers/responseSerializer");
 const { comparePassword } = require("../../pkg/helpers/bcrypt");
-// ---------------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {

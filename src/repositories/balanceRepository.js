@@ -1,4 +1,4 @@
-const { Balances } = require("../../db/models");
+const { Users, Balances } = require("../../db/models");
 
 exports.getBalances = async (offset = 0, limit = 10, filter = {}) => {
   const response = { data: null, error: null, count: 0 };
@@ -8,6 +8,14 @@ exports.getBalances = async (offset = 0, limit = 10, filter = {}) => {
       offset: offset,
       limit: limit,
       where: filter,
+      include: [
+        {
+          model: Users,
+          as: "user",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
     });
     if (!response.data) {
       throw new Error("balances data not found");
@@ -31,6 +39,14 @@ exports.getBalance = async (balanceId) => {
       where: {
         id: balanceId,
       },
+      include: [
+        {
+          model: Users,
+          as: "user",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
     });
 
     if (!response.data) {
@@ -38,21 +54,6 @@ exports.getBalance = async (balanceId) => {
     }
   } catch (error) {
     response.error = `error on get data : ${error.message}`;
-  }
-
-  return response;
-};
-
-exports.createBalance = async (balance) => {
-  const response = { data: null, error: null };
-
-  try {
-    response.data = await Balances.create({
-      userId: balance.userId,
-      balance: balance.balance,
-    });
-  } catch (error) {
-    response.error = `error on create data : ${error.message}`;
   }
 
   return response;

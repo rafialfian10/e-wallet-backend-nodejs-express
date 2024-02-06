@@ -3,7 +3,6 @@ const httpStatus = require("http-status");
 const { getBalance, deleteBalance, } = require("../../repositories/balanceRepository");
 const { singleBalanceResponse } = require("../../serializers/balanceSerializer");
 const { successResponse, errorResponse, } = require("../../serializers/responseSerializer");
-// -----------------------------------------------------
 
 module.exports = async (req, res) => {
   try {

@@ -1,13 +1,12 @@
 const httpStatus = require("http-status");
-// ----------------------------------------------
 
 exports.successResponse = ({
   response,
   status,
-  data,
   totalData,
   limit = 10,
   page,
+  data,
 }) => {
   response.status(status || httpStatus.OK).json({
     status: status || httpStatus.OK,

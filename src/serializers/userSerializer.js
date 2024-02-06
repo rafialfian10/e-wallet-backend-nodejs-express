@@ -2,7 +2,7 @@ const joi = require("joi");
 
 const { Users } = require("../../db/models");
 const { singleRoleResponse } = require("./roleSerializer");
-// --------------------------------------------------------------
+const { singleBalanceResponse } = require("./balanceSerializer");
 
 exports.singleUserResponse = (userData) => {
   const user =
@@ -19,6 +19,7 @@ exports.singleUserResponse = (userData) => {
     address: user.address,
     photo: user.photo,
     role: singleRoleResponse(user.role),
+    balance: user.balance ? singleBalanceResponse(user.balance) : null,
   };
 };
 

@@ -9,7 +9,6 @@ const {
   successResponse,
   errorResponse,
 } = require("../../serializers/responseSerializer");
-// -----------------------------------------------------
 
 module.exports = async (req, res) => {
   try {

@@ -6,7 +6,6 @@ const {
   errorResponse,
 } = require("../../serializers/responseSerializer");
 const { singleUserResponse } = require("../../serializers/userSerializer");
-// --------------------------------------------------------------------------
 
 module.exports = async (req, res) => {
   try {
