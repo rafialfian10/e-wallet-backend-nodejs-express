@@ -17,6 +17,7 @@ exports.singleUserResponse = (userData) => {
     isPhoneVerified: user.isPhoneVerified,
     gender: user.gender,
     address: user.address,
+    pin: user.pin,
     photo: user.photo,
     role: singleRoleResponse(user.role),
     balance: user.balance ? singleBalanceResponse(user.balance) : null,
@@ -38,9 +39,10 @@ exports.validateCreateUserRequest = (userData) => {
       .string()
       .regex(/^\d{10,13}$/)
       .required(),
-    roleId: joi.number(),
-    // gender: joi.string().required(),
-    // address: joi.string().required(),
+    pin: joi
+      .string()
+      .pattern(/^[0-9]{6}$/)
+      .required(),
   });
 
   try {
@@ -62,6 +64,7 @@ exports.validateUpdateUserRequest = (userData) => {
     phone: joi.string(),
     gender: joi.string(),
     address: joi.string(),
+    pin: joi.string().pattern(/^[0-9]{6}$/),
     roleId: joi.number(),
   });
 

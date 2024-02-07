@@ -86,6 +86,7 @@ exports.createUser = async (user) => {
       isPhoneVerified: false,
       gender: user.gender,
       address: user.address,
+      pin: user.pin,
       photo: user.photo,
       roleId: user.roleId,
     });

@@ -53,6 +53,7 @@ module.exports = async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
+        pin: user.pin,
         roleId: user.roleId,
       },
       process.env.JWT_SECRET,

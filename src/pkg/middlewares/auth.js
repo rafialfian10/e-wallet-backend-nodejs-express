@@ -38,7 +38,9 @@ exports.adminAuth = async (req, res, next) => {
       if (err) {
         throw err;
       } else if (payload.roleId !== 1 && payload.roleId !== 2) {
-        throw new Error("Your'e not allowed to access this, only admin can access");
+        throw new Error(
+          "Your'e not allowed to access this, only admin can access"
+        );
       }
       req.userData = payload;
     });
@@ -64,7 +66,9 @@ exports.superAdminAuth = async (req, res, next) => {
       if (err) {
         throw err;
       } else if (payload.roleId !== 1) {
-        throw new Error("Your'e not allowed to access this, only super admin can access");
+        throw new Error(
+          "Your'e not allowed to access this, only super admin can access"
+        );
       }
       req.userData = payload;
     });

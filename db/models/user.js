@@ -44,12 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       gender: DataTypes.STRING,
       address: DataTypes.TEXT,
       photo: DataTypes.STRING,
-      pin: {
-        type: DataTypes.INTEGER,
-        validate: {
-          len: [6, 6], // max length 6 character
-        },
-      },
+      pin: DataTypes.INTEGER,
       roleId: DataTypes.INTEGER,
     },
     {

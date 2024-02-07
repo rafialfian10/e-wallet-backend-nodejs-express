@@ -92,6 +92,15 @@ module.exports = async (req, res) => {
       user.address = req.body.address;
     }
 
+    // update pin
+    if (
+      req.body.pin !== null &&
+      req.body.pin !== undefined &&
+      req.body.pin !== user.pin
+    ) {
+      user.pin = req.body.pin;
+    }
+
     // update role
     if (
       req.body.roleId !== null &&

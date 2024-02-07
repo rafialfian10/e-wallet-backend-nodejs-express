@@ -27,7 +27,10 @@ module.exports = async (req, res) => {
       email: req.body.email,
       password: await hashPassword(req.body.password, 11),
       phone: req.body.phone,
+      pin: req.body.pin,
     };
+
+    console.log(newUser);
 
     /**
      * user not logged in only can register as user
