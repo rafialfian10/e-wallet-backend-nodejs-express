@@ -1,4 +1,7 @@
 "use strict";
+
+const { sequelize } = require('../models');
+
 /** @type {import('sequelize-cli').Migration} */
 
 module.exports = {
@@ -38,6 +41,9 @@ module.exports = {
       },
       photo: {
         type: Sequelize.STRING,
+      },
+      pin: {
+        type: Sequelize.INTEGER,
       },
       role_id: {
         type: Sequelize.INTEGER,

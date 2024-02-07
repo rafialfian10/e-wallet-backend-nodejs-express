@@ -1,6 +1,6 @@
-const { Transactions } = require("../../db/models");
+const { Users, Transactions } = require("../../db/models");
 
-exports.getTransactions = async (offset = 0, limit = 10, filter = {}) => {
+exports.getTransactionsByAdmin = async (offset = 0, limit = 10, filter = {}) => {
   const response = { data: null, error: null, count: 0 };
 
   try {
@@ -8,13 +8,54 @@ exports.getTransactions = async (offset = 0, limit = 10, filter = {}) => {
       offset: offset,
       limit: limit,
       where: filter,
+      include: [
+        {
+          model: Users,
+          as: "user",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+      order: [["transaction_date", "DESC"]]
     });
     if (!response.data) {
       throw new Error("transactions data not found");
     }
 
-    response.count = await Balances.count({
+    response.count = await Transactions.count({
       where: filter,
+    });
+  } catch (error) {
+    response.error = `error on get datas : ${error.message}`;
+  }
+
+  return response;
+};
+
+exports.getTransactionsByUser = async (userId, offset = 0, limit = 10, filter = {}) => {
+  const response = { data: null, error: null, count: 0 };
+
+  try {
+    response.data = await Transactions.findAll({
+      offset: offset,
+      limit: limit,
+      where: { ...filter, userId: userId },
+      include: [
+        {
+          model: Users,
+          as: "user",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+      order: [["transaction_date", "DESC"]]
+    });
+    if (!response.data) {
+      throw new Error("transactions data not found");
+    }
+
+    response.count = await Transactions.count({
+      where: { ...filter, userId: userId },
     });
   } catch (error) {
     response.error = `error on get datas : ${error.message}`;
@@ -31,6 +72,14 @@ exports.getTransaction = async (transactionId) => {
       where: {
         id: transactionId,
       },
+      include: [
+        {
+          model: Users,
+          as: "user",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+      ],
+      attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
     });
 
     if (!response.data) {
@@ -43,30 +92,36 @@ exports.getTransaction = async (transactionId) => {
   return response;
 };
 
-exports.createTransaction = async (transaction) => {
+exports.topupTransaction = async (transaction) => {
   const response = { data: null, error: null };
 
   try {
     response.data = await Transactions.create({
       userId: transaction.userId,
       amount: transaction.amount,
-      transaction_type: transaction.transaction_type,
-      transaction_date: transaction.transaction_date,
+      transactionType: transaction.transactionType,
+      transactionDate: transaction.transactionDate,
     });
   } catch (error) {
     response.error = `error on create data : ${error.message}`;
   }
 
+
   return response;
 };
 
-exports.updateTransaction = async (transaction) => {
+exports.transferTransaction = async (transaction) => {
   const response = { data: null, error: null };
 
   try {
-    response.data = await transaction.save();
+    response.data = await Transactions.create({
+      userId: transaction.userId,
+      amount: transaction.amount,
+      transactionType: transaction.transactionType,
+      transactionDate: transaction.transactionDate,
+    });
   } catch (error) {
-    response.error = `error on update data : ${error.message}`;
+    response.error = `error on create data : ${error.message}`;
   }
 
   return response;

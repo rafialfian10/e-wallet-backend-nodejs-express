@@ -59,13 +59,65 @@ exports.getBalance = async (balanceId) => {
   return response;
 };
 
-exports.updateBalance = async (balance) => {
+exports.createBalance = async (balance) => {
   const response = { data: null, error: null };
 
   try {
+    response.data = await Balances.create({
+      userId: balance.userId,
+      balance: balance.balance,
+    });
+  } catch (error) {
+    response.error = `error on create data : ${error.message}`;
+  }
+
+  return response;
+};
+
+exports.updateBalance = async (newBalance, otherUserId) => {
+  const response = { data: null, error: null };
+
+  try {
+    const balance = await Balances.findOne({
+      where: {
+        userId: newBalance.userId,
+      },
+    });
+
+    if (!balance) {
+      throw new Error(`Balance for user with id ${balance.userId} not found`);
+    }
+
+    if (newBalance.transactionType === "topup") {
+      balance.balance += newBalance.amount;
+    } else if (newBalance.transactionType === "transfer") {
+      if (balance.balance < newBalance.amount) {
+        throw new Error(
+          `balance is not sufficient, your remaining balance is ${balance.balance}`
+        );
+      } else {
+        const otherUser = await Balances.findOne({
+          where: {
+            userId: otherUserId,
+          },
+        });
+
+        if (!otherUser) {
+          throw new Error(`User with id ${balance.userId} not found`);
+        }
+
+        // reduce balance
+        balance.balance = balance.balance - newBalance.amount;
+
+        // add balance to other user
+        otherUser.balance += newBalance.amount;
+        await otherUser.save();
+      }
+    }
+
     response.data = await balance.save();
   } catch (error) {
-    response.error = `error on update data : ${error.message}`;
+    response.error = `Error updating balance: ${error.message}`;
   }
 
   return response;

@@ -1,7 +1,6 @@
 const joi = require("joi");
 
 const { Transactions } = require("../../db/models");
-const { singleUserResponse } = require("./userSerializer");
 
 exports.singleTransactionResponse = (transactionData) => {
   const transaction =
@@ -11,10 +10,11 @@ exports.singleTransactionResponse = (transactionData) => {
 
   return {
     id: transaction.id,
+    userId: transaction.userId,
     amount: transaction.amount,
-    transaction_type: transaction.transaction_type,
-    transaction_date: transaction.transaction_date,
-    user: singleUserResponse(transaction.user),
+    transactionType: transaction.transactionType,
+    transactionDate: transaction.transactionDate,
+    user: transaction.user,
   };
 };
 
@@ -24,12 +24,12 @@ exports.multipleTransctionResponse = (transactionsData) => {
   });
 };
 
-exports.validateCreateTransactionRequest = (transactionData) => {
+exports.validateTopupTransactionRequest = (transactionData) => {
   const schema = joi.object({
-    amount: joi.number().required(),
-    transaction_type: joi.string().required(),
-    transaction_date: joi.string().required(),
     userId: joi.string().required(),
+    amount: joi.number().required(),
+    transactionType: joi.string().required(),
+    transactionDate: joi.date().iso().required(),
   });
 
   try {
@@ -43,12 +43,13 @@ exports.validateCreateTransactionRequest = (transactionData) => {
   }
 };
 
-exports.validateUpdateTransactionRequest = (transactionData) => {
+exports.validateTransferTransactionRequest = (transactionData) => {
   const schema = joi.object({
-    amount: joi.number(),
-    transaction_type: joi.string(),
-    transaction_date: joi.string(),
-    userId: joi.string(),
+    userId: joi.string().required(),
+    amount: joi.number().required(),
+    transactionType: joi.string().required(),
+    transactionDate: joi.date().iso().required(),
+    otherUserId: joi.string().required(),
   });
 
   try {
@@ -61,3 +62,4 @@ exports.validateUpdateTransactionRequest = (transactionData) => {
     return error.message;
   }
 };
+
