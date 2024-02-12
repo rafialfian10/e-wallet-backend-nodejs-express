@@ -61,9 +61,9 @@ exports.validateUpdateUserRequest = (userData) => {
     username: joi.string(),
     email: joi.string().email(),
     password: joi.string(),
-    phone: joi.string(),
-    gender: joi.string(),
-    address: joi.string(),
+    phone: joi.string().allow(null, '').regex(/^\d{11,13}$/),
+    gender: joi.string().allow(null, ''),
+    address: joi.string().allow(null, ''),
     pin: joi.string().pattern(/^[0-9]{6}$/),
     roleId: joi.number(),
   });
