@@ -1,4 +1,4 @@
-const { Users, Transactions } = require("../../db/models");
+const { Users, Transactions } = require("../../database/models");
 
 exports.getTransactionsByAdmin = async (offset = 0, limit = 10, filter = {}) => {
   const response = { data: null, error: null, count: 0 };

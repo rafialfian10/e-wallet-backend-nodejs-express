@@ -15,10 +15,10 @@ const diskStoragePhoto = multer.diskStorage({
   },
 });
 
-const diskStorageImage = multer.diskStorage({
+const diskStorageFile = multer.diskStorage({
   // konfigurasi lokasi penyimpanan file
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "../../../uploads/image"));
+    cb(null, path.join(__dirname, "../../../uploads/file-message"));
   },
   // konfigurasi penamaan file yang unik
   filename: function (req, file, cb) {
@@ -45,8 +45,8 @@ const uploadPhoto = multer({
   },
 });
 
-const uploadImage = multer({
-  storage: diskStorageImage,
+const uploadFile = multer({
+  storage: diskStorageFile,
   // limits: 8192000,
   limits: { fileSize: 8192000 }, // 8Mb
   fileFilter: (req, file, cb) => {
@@ -85,8 +85,8 @@ exports.uploadPhoto = async (req, res, next) => {
   });
 };
 
-exports.uploadSingleImage = async (req, res, next) => {
-  uploadImage.single("image")(req, res, function (err) {
+exports.uploadSingleFile = async (req, res, next) => {
+  uploadFile.single("file")(req, res, function (err) {
     try {
       if (err instanceof multer.MulterError) {
         throw err;
@@ -104,10 +104,10 @@ exports.uploadSingleImage = async (req, res, next) => {
   });
 };
 
-exports.uploadMultipleImage = async (req, res, next) => {
-  uploadImage.fields([
+exports.uploadMultipleFile = async (req, res, next) => {
+  uploadFile.fields([
     {
-      name: "images",
+      name: "file",
     },
   ])(req, res, function (err) {
     try {

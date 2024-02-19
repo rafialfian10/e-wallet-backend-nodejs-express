@@ -1,4 +1,4 @@
-const { Users, Balances } = require("../../db/models");
+const { Users, Balances } = require("../../database/models");
 
 exports.getBalances = async (offset = 0, limit = 10, filter = {}) => {
   const response = { data: null, error: null, count: 0 };

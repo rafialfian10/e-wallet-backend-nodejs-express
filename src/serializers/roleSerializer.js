@@ -1,6 +1,6 @@
 const joi = require("joi");
 
-const { Roles } = require("../../db/models");
+const { Roles } = require("../../database/models");
 
 exports.singleRoleResponse = (roleData) => {
   const role =

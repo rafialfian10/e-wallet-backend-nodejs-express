@@ -1,6 +1,6 @@
 const joi = require("joi");
 
-const { Users } = require("../../db/models");
+const { Users } = require("../../database/models");
 const { singleRoleResponse } = require("./roleSerializer");
 const { singleBalanceResponse } = require("./balanceSerializer");
 

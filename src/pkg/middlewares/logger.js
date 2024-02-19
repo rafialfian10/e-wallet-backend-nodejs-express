@@ -1,4 +1,4 @@
-const { Logs } = require("../../../db/models");
+const { Logs } = require("../../../database/models");
 
 const logger = async (req, res, next) => {
   const startTime = Date.now();

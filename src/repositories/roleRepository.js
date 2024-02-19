@@ -1,4 +1,4 @@
-const { Roles } = require("../../db/models");
+const { Roles } = require("../../database/models");
 
 exports.getRoles = async (offset = 0, limit = 10, filter = {}) => {
   const response = { data: null, error: null, count: 0 };

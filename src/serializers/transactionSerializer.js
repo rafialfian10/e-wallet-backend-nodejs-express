@@ -1,6 +1,6 @@
 const joi = require("joi");
 
-const { Transactions } = require("../../db/models");
+const { Transactions } = require("../../database/models");
 
 exports.singleTransactionResponse = (transactionData) => {
   const transaction =

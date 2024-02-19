@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 
-const { Users, Roles, Balances } = require("../../db/models");
+const { Users, Roles, Balances } = require("../../database/models");
 // ---------------------------------------------------------
 
 exports.getUsers = async (offset = 0, limit = 10, filter = {}) => {

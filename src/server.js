@@ -7,10 +7,28 @@ const router = require("./routes");
 const { redisInit } = require("../config/redis");
 const customLogger = require("./pkg/middlewares/logger");
 
+// socket io
+const http = require("http");
+const { Server } = require("socket.io");
+
 require("dotenv").config(); // read environment variable from .env file
 
 // create instance of express
 const app = express();
+
+// add after app initialization
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // define client origin if both client and server have different origin
+  },
+});
+
+// import socket function and call with parameter io
+require("../src/socket")(io);
+
+// incoming request parser
+app.use(express.json());
 
 // configuration cors
 app.use(
@@ -36,9 +54,6 @@ app.use(logger);
 // custom logger middleware
 app.use(customLogger);
 
-// incoming request parser
-app.use(express.json());
-
 // create router group
 app.use("/api/v1/", router);
 
@@ -47,6 +62,6 @@ app.use("/static", express.static(path.join(__dirname, "../uploads")));
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

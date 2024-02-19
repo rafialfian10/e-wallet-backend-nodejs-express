@@ -1,8 +1,8 @@
-exports.imageUrlGenerator = (req, imageFileName) => {
+exports.fileUrlGenerator = (req, imageFileName) => {
   if (req.hostname === "localhost" || req.host === "127.0.0.1") {
-    return `${req.protocol}://${req.get("host")}/static/image/${imageFileName}`;
+    return `${req.protocol}://${req.get("host")}/static/file-message/${imageFileName}`;
   } else {
-    return `https://${req.hostname}/static/image/${imageFileName}`;
+    return `https://${req.hostname}/static/file-message/${imageFileName}`;
   }
 };
 
