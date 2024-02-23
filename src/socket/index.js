@@ -17,7 +17,7 @@ const socketIo = (io) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("client connect: ", socket.id);
+    // console.log(socket.id);
 
     // get user connected id
     const userId = socket.handshake.query.id;
@@ -86,7 +86,7 @@ const socketIo = (io) => {
     });
 
     // define listener on event load user contact
-    socket.on("load user contacts", async () => {
+    socket.on("load user contact", async () => {
       try {
         let userContacts = await Users.findAll({
           include: [
@@ -133,13 +133,12 @@ const socketIo = (io) => {
         });
 
         userContacts = JSON.parse(JSON.stringify(userContacts));
-        console.log("user contact", userContacts);
         // userContacts = userContacts.map((item) => ({
         //   ...item,
         //   photo: item.photo ? process.env.PATH_FILE + item.photo : null,
         // }));
 
-        socket.emit("customer contacts", userContacts);
+        socket.emit("user contact", userContacts);
       } catch (err) {
         console.log(err);
       }
@@ -149,10 +148,10 @@ const socketIo = (io) => {
     socket.on("load messages", async (payload) => {
       try {
         const token = socket.handshake.auth.token;
-
+        
         const tokenKey = process.env.JWT_SECRET;
-        const verified = jwt.verify(token, tokenKey);
-
+        const verified = jwt.verify(token._j, tokenKey);
+        
         const recipientId = payload; // catch recipient id sent from client
         const senderId = verified.id; //id user
 
@@ -205,7 +204,7 @@ const socketIo = (io) => {
         const token = socket.handshake.auth.token;
 
         const tokenKey = process.env.JWT_SECRET;
-        const verified = jwt.verify(token, tokenKey);
+        const verified = jwt.verify(token._j, tokenKey);
 
         const senderId = verified.id; //id user
         const { message, file, recipientId } = payload; // catch recipient id and message sent from client
