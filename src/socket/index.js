@@ -45,7 +45,7 @@ const socketIo = (io) => {
             role_id: 1,
           },
           attributes: {
-            exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
+            exclude: ["updatedAt", "deletedAt", "password"],
           },
         });
 
@@ -75,7 +75,7 @@ const socketIo = (io) => {
             role_id: 2,
           },
           attributes: {
-            exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
+            exclude: ["updatedAt", "deletedAt", "password"],
           },
         });
 
@@ -86,7 +86,7 @@ const socketIo = (io) => {
     });
 
     // define listener on event load user contact
-    socket.on("load user contact", async () => {
+    socket.on("load users contact", async () => {
       try {
         let userContacts = await Users.findAll({
           include: [
@@ -105,7 +105,6 @@ const socketIo = (io) => {
               as: "recipientMessage",
               attributes: {
                 exclude: [
-                  "createdAt",
                   "updatedAt",
                   "deletedAt",
                   "recipientId",
@@ -118,7 +117,6 @@ const socketIo = (io) => {
               as: "senderMessage",
               attributes: {
                 exclude: [
-                  "createdAt",
                   "updatedAt",
                   "deletedAt",
                   "recipientId",
@@ -128,7 +126,7 @@ const socketIo = (io) => {
             },
           ],
           attributes: {
-            exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
+            exclude: ["updatedAt", "deletedAt", "password"],
           },
         });
 
@@ -138,7 +136,7 @@ const socketIo = (io) => {
         //   photo: item.photo ? process.env.PATH_FILE + item.photo : null,
         // }));
 
-        socket.emit("user contact", userContacts);
+        socket.emit("users contact", userContacts);
       } catch (err) {
         console.log(err);
       }
