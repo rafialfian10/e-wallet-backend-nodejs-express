@@ -131,3 +131,6 @@ dist
 
 # docs folder
 docs/
+
+# uploads folder
+uploads/

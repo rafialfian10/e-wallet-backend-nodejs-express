@@ -198,6 +198,7 @@ const socketIo = (io) => {
 
     // define listener on event send message
     socket.on("send message", async (payload) => {
+      console.log("---------------------", payload);
       try {
         const token = socket.handshake.auth.token;
 
@@ -230,3 +231,14 @@ const socketIo = (io) => {
 };
 
 module.exports = socketIo;
+
+// {
+//   fieldname: 'photo',
+//   originalname: 'Raff.jpg',
+//   encoding: '7bit',
+//   mimetype: 'image/jpeg',
+//   destination: 'D:\\projects\\project-nutech-e-wallet\\server\\uploads\\photo',
+//   filename: 'img-1708902584409.jpg',
+//   path: 'D:\\projects\\project-nutech-e-wallet\\server\\uploads\\photo\\img-1708902584409.jpg',
+//   size: 526258
+// }
