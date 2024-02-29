@@ -1,6 +1,6 @@
 const httpStatus = require("http-status");
-const multer = require("multer");
 const path = require("path");
+const multer = require("multer");
 // --------------------------------------------------
 
 const diskStoragePhoto = multer.diskStorage({
@@ -126,4 +126,3 @@ exports.uploadMultipleFile = async (req, res, next) => {
     }
   });
 };
-

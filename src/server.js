@@ -10,17 +10,28 @@ const customLogger = require("./pkg/middlewares/logger");
 // socket io
 const http = require("http");
 const { Server } = require("socket.io");
+var socketiofileupload = require("socketio-file-upload"); 
 
 require("dotenv").config(); // read environment variable from .env file
 
 // create instance of express
 const app = express();
 
+// socket io file upload
+app.use(socketiofileupload.router)
+
 // add after app initialization
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://192.168.249.106:8081", // define client origin if both client and server have different origin
+    origin: process.env.SOCKET_CLIENT, // define client origin if both client and server have different origin
+    methods: ["GET", "POST", "DELETE"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Authorization",
+    ],
   },
 });
 

@@ -1,5 +1,11 @@
-const { Users, Roles, Balances, Chats } = require("../../database/models");
 const jwt = require("jsonwebtoken");
+const path = require("path");
+var socketiofileupload = require("socketio-file-upload");
+const { v4: uuidv4 } = require("uuid");
+
+const { Users, Roles, Balances, Chats } = require("../../database/models");
+const { uploadSingleFile } = require("../pkg/middlewares/uploadFile");
+const { fileUrlGenerator } = require("../pkg/helpers/imgUrlGenerator");
 
 // import sequelize operator => https://sequelize.org/master/manual/model-querying-basics.html#operators
 const { Op } = require("sequelize");
@@ -16,9 +22,7 @@ const socketIo = (io) => {
     }
   });
 
-  io.on("connection", (socket) => {
-    // console.log(socket.id);
-
+  io.sockets.on("connection", (socket) => {
     // get user connected id
     const userId = socket.handshake.query.id;
 
@@ -104,24 +108,14 @@ const socketIo = (io) => {
               model: Chats,
               as: "recipientMessage",
               attributes: {
-                exclude: [
-                  "updatedAt",
-                  "deletedAt",
-                  "recipientId",
-                  "senderId",
-                ],
+                exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
               },
             },
             {
               model: Chats,
               as: "senderMessage",
               attributes: {
-                exclude: [
-                  "updatedAt",
-                  "deletedAt",
-                  "recipientId",
-                  "senderId",
-                ],
+                exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
               },
             },
           ],
@@ -146,10 +140,10 @@ const socketIo = (io) => {
     socket.on("load messages", async (payload) => {
       try {
         const token = socket.handshake.auth.token;
-        
+
         const tokenKey = process.env.JWT_SECRET;
         const verified = jwt.verify(token._j, tokenKey);
-        
+
         const recipientId = payload; // catch recipient id sent from client
         const senderId = verified.id; //id user
 
@@ -198,7 +192,6 @@ const socketIo = (io) => {
 
     // define listener on event send message
     socket.on("send message", async (payload) => {
-      console.log("---------------------", payload);
       try {
         const token = socket.handshake.auth.token;
 
@@ -206,8 +199,42 @@ const socketIo = (io) => {
         const verified = jwt.verify(token._j, tokenKey);
 
         const senderId = verified.id; //id user
-        const { message, file, recipientId } = payload; // catch recipient id and message sent from client
+        const { message, file, recipientId } = payload; // catch recipient id, message, file sent from client
 
+        // upload file
+        var uploader = new socketiofileupload();
+        uploader.dir = path.join(__dirname, "../../uploads/file-message");
+        uploader.listen(socket);
+
+        // Event listener for when a file is saved
+        // uploader.on("saved", async function (event) {
+        //   try {
+        //     console.log("File saved:", event.file);
+        //     // Handle file saving here if needed
+        //     await Chats.create({
+        //       message,
+        //       file,
+        //       senderId,
+        //       recipientId,
+        //     });
+        //   } catch (error) {
+        //     console.error("Error handling saved file:", error);
+        //   }
+        // });
+
+        // Error handler for uploader
+        // uploader.on("error", function (event) {
+        //   console.error("Error from uploader:", event);
+        // });
+
+        // let savedFileName = null;
+        // if (file) {
+        //   // Save file to server
+        //   await uploadSingleFile(socket.request, socket.request.res);
+
+        //   // Generate URL for the uploaded file
+        //   savedFileName = fileUrlGenerator(socket.request, file.filename);
+        // }
         await Chats.create({
           message,
           file,
@@ -215,10 +242,26 @@ const socketIo = (io) => {
           recipientId,
         });
 
-        // emit to just sender and recipient default rooms by their socket id
         io.to(socket.id)
           .to(connectedUser[recipientId])
           .emit("new message", recipientId);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    // define listener on event send message
+    socket.on("delete messages", async (ids) => {
+      try {
+        await Chats.destroy({
+          where: {
+            id: {
+              [Op.in]: ids,
+            },
+          },
+        });
+
+        io.emit("messages deleted", ids);
       } catch (error) {
         console.log(error);
       }
