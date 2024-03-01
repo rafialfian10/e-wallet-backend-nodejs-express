@@ -47,16 +47,28 @@ const uploadPhoto = multer({
 
 const uploadFile = multer({
   storage: diskStorageFile,
-  // limits: 8192000,
-  limits: { fileSize: 8192000 }, // 8Mb
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB (dalam byte)
   fileFilter: (req, file, cb) => {
     if (
       file.mimetype !== "image/png" &&
       file.mimetype !== "image/jpg" &&
       file.mimetype !== "image/jpeg" &&
-      file.mimetype !== "image/webp"
+      file.mimetype !== "image/webp" &&
+      file.mimetype !== "video/mp4" &&
+      file.mimetype !== "video/mkv" &&
+      file.mimetype !== "video/wmv" &&
+      file.mimetype !== "video/avi" &&
+      file.mimetype !== "audio/mp3" &&
+      file.mimetype !== "audio/wav" &&
+      file.mimetype !== "audio/wma" &&
+      file.mimetype !== "audio/mpeg" &&
+      file.mimetype !== "application/pdf" &&
+      file.mimetype !== "application/doc" &&
+      file.mimetype !== "application/docx" &&
+      file.mimetype !== "application/pptx" &&
+      file.mimetype !== "application/xlsx"
     ) {
-      return cb(new Error("Only .png, .jpg, .webp and .jpeg format allowed!"));
+      return cb(new Error("Format not allowed!"));
     } else {
       cb(null, true);
     }

@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const path = require("path");
-var socketiofileupload = require("socketio-file-upload");
-const { v4: uuidv4 } = require("uuid");
+// const fs = require("fs");
+const siofu = require("socketio-file-upload");
 
 const { Users, Roles, Balances, Chats } = require("../../database/models");
 const { uploadSingleFile } = require("../pkg/middlewares/uploadFile");
@@ -22,12 +22,17 @@ const socketIo = (io) => {
     }
   });
 
-  io.sockets.on("connection", (socket) => {
+  io.on("connection", (socket) => {
     // get user connected id
     const userId = socket.handshake.query.id;
 
     // save to connectedUser
     connectedUser[userId] = socket.id;
+
+    // upload file
+    var uploader = new siofu();
+    uploader.dir = path.join(__dirname, "../../uploads/file-message");
+    uploader.listen(socket);
 
     // define listener on event load super admin contact
     socket.on("load super admin contact", async () => {
@@ -201,50 +206,29 @@ const socketIo = (io) => {
         const senderId = verified.id; //id user
         const { message, file, recipientId } = payload; // catch recipient id, message, file sent from client
 
-        // upload file
-        var uploader = new socketiofileupload();
-        uploader.dir = path.join(__dirname, "../../uploads/file-message");
-        uploader.listen(socket);
-
         // Event listener for when a file is saved
-        // uploader.on("saved", async function (event) {
-        //   try {
-        //     console.log("File saved:", event.file);
-        //     // Handle file saving here if needed
-        //     await Chats.create({
-        //       message,
-        //       file,
-        //       senderId,
-        //       recipientId,
-        //     });
-        //   } catch (error) {
-        //     console.error("Error handling saved file:", error);
-        //   }
-        // });
+        if (!file) {
+          await Chats.create({
+            message,
+            senderId,
+            recipientId,
+          });
 
-        // Error handler for uploader
-        // uploader.on("error", function (event) {
-        //   console.error("Error from uploader:", event);
-        // });
+          io.to(socket.id)
+            .to(connectedUser[recipientId])
+            .emit("new message", recipientId);
+        } else {
+          await Chats.create({
+            message,
+            file,
+            senderId,
+            recipientId,
+          });
 
-        // let savedFileName = null;
-        // if (file) {
-        //   // Save file to server
-        //   await uploadSingleFile(socket.request, socket.request.res);
-
-        //   // Generate URL for the uploaded file
-        //   savedFileName = fileUrlGenerator(socket.request, file.filename);
-        // }
-        await Chats.create({
-          message,
-          file,
-          senderId,
-          recipientId,
-        });
-
-        io.to(socket.id)
-          .to(connectedUser[recipientId])
-          .emit("new message", recipientId);
+          io.to(socket.id)
+            .to(connectedUser[recipientId])
+            .emit("new message", recipientId);
+        }
       } catch (error) {
         console.log(error);
       }
