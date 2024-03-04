@@ -22,12 +22,17 @@ module.exports = (sequelize, DataTypes) => {
           name: "recipientId",
         },
       });
+      Chats.hasMany(models.Files, {
+        as: "files",
+        foreignKey: {
+          name: "chatId",
+        },
+      });
     }
   }
   Chats.init(
     {
       message: DataTypes.TEXT,
-      file: DataTypes.STRING,
       senderId: {
         type: DataTypes.UUID,
         allowNull: false,

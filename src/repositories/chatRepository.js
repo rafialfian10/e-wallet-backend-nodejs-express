@@ -1,4 +1,4 @@
-const { Users, Chats } = require("../../database/models");
+const { Users, Chats, Files } = require("../../database/models");
 
 exports.getChats = async (offset = 0, limit = 30, filter = {}) => {
   const response = { data: null, error: null, count: 0 };
@@ -46,6 +46,11 @@ exports.getChat = async (chatId) => {
       },
       include: [
         {
+          model: Files,
+          as: "files",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+        {
           model: Users,
           as: "sender",
           attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
@@ -55,7 +60,6 @@ exports.getChat = async (chatId) => {
           as: "recipient",
           attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
         },
-        
       ],
       attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
     });
@@ -70,16 +74,23 @@ exports.getChat = async (chatId) => {
   return response;
 };
 
-exports.createChat = async (chat) => {
+exports.createChat = async (chat, files) => {
   const response = { data: null, error: null };
 
   try {
-    response.data = await Chats.create({
+    const createdChat = await Chats.create({
       message: chat.message,
-      file: chat.file,
       senderId: chat.senderId,
       recipientId: chat.recipientId,
     });
+
+    if (files.length > 0) {
+      await Files.bulkCreate(
+        files.map((file) => ({ file: file.file, chatId: createdChat.id }))
+      );
+    }
+
+    response.data = createdChat;
   } catch (error) {
     response.error = `error on create data : ${error.message}`;
   }
@@ -91,6 +102,12 @@ exports.deleteChat = async (chat) => {
   const response = { data: null, error: null };
 
   try {
+    await Files.destroy({
+      where: {
+        chatId: chat.id,
+      },
+    });
+
     response.data = await chat.destroy();
   } catch (error) {
     response.error = `error on delete data : ${error.message}`;

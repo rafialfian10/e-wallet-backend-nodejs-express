@@ -3,29 +3,20 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("chats", {
+    await queryInterface.createTable("files", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      message: {
-        type: Sequelize.TEXT,
+      file: {
+        type: Sequelize.STRING,
       },
-      sender_id: {
-        type: Sequelize.UUID,
+      chat_id: {
+        type: Sequelize.INTEGER,
         references: {
-          model: "users",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-      },
-      recipient_id: {
-        type: Sequelize.UUID,
-        references: {
-          model: "users",
+          model: "chats",
           key: "id",
         },
         onUpdate: "CASCADE",
@@ -48,6 +39,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("chats");
+    await queryInterface.dropTable("files");
   },
 };

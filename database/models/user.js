@@ -14,19 +14,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "roleId",
         as: "role",
       });
-
       Users.hasOne(models.Balances, {
         foreignKey: "userId",
         as: "balance",
       });
-
       Users.hasMany(models.Chats, {
         as: "senderMessage",
         foreignKey: {
           name: "senderId",
         },
       });
-
       Users.hasMany(models.Chats, {
         as: "recipientMessage",
         foreignKey: {

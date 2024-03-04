@@ -9,7 +9,7 @@ const {
   successResponse,
   errorResponse,
 } = require("../../serializers/responseSerializer");
-const { fileUrlGenerator}  = require("../../pkg/helpers/imgUrlGenerator");
+const { fileUrlGenerator } = require("../../pkg/helpers/imgUrlGenerator");
 
 module.exports = async (req, res) => {
   try {
@@ -19,8 +19,12 @@ module.exports = async (req, res) => {
       recipientId: req.body.recipientId,
     };
 
-    if (req.file) {
-      newChat.file = fileUrlGenerator(req, req.file.filename);
+    let files = [];
+
+    if (req.files && req.files.length > 0) {
+      files = req.files.map((file) => ({
+        file: fileUrlGenerator(req, file.filename),
+      }));
     }
 
     const error = validateCreateChatRequest(newChat);
@@ -31,7 +35,8 @@ module.exports = async (req, res) => {
     }
 
     const { data: dataChat, error: errorCreateChat } = await createChat(
-      newChat
+      newChat,
+      files
     );
     if (errorCreateChat) {
       const error = new Error(errorCreateChat);

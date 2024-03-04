@@ -1,6 +1,6 @@
 const joi = require("joi");
 
-const { Chats } = require("../../database/models");
+const { Chats, Files } = require("../../database/models");
 
 exports.singleChatResponse = (chatData) => {
   const chat =
@@ -9,7 +9,7 @@ exports.singleChatResponse = (chatData) => {
   return {
     id: chat.id,
     message: chat.message,
-    file: chat.file,
+    files: chat.files,
     senderId: chat.senderId,
     sender: chat.sender,
     recipientId: chat.recipientId,

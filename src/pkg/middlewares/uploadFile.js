@@ -117,11 +117,7 @@ exports.uploadSingleFile = async (req, res, next) => {
 };
 
 exports.uploadMultipleFile = async (req, res, next) => {
-  uploadFile.fields([
-    {
-      name: "file",
-    },
-  ])(req, res, function (err) {
+  uploadFile.array("files")(req, res, function (err) {
     try {
       if (err instanceof multer.MulterError) {
         throw err;
@@ -138,3 +134,26 @@ exports.uploadMultipleFile = async (req, res, next) => {
     }
   });
 };
+
+// exports.uploadMultipleFile = async (req, res, next) => {
+//   uploadFile.fields([
+//     {
+//       name: "file",
+//     },
+//   ])(req, res, function (err) {
+//     try {
+//       if (err instanceof multer.MulterError) {
+//         throw err;
+//       } else if (err) {
+//         throw err;
+//       }
+
+//       next();
+//     } catch (error) {
+//       res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+//         status: httpStatus.INTERNAL_SERVER_ERROR,
+//         message: error.message,
+//       });
+//     }
+//   });
+// };
