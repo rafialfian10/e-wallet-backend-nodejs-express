@@ -14,10 +14,14 @@ const { fileUrlGenerator } = require("../../pkg/helpers/imgUrlGenerator");
 module.exports = async (req, res) => {
   try {
     const newChat = {
-      message: req.body.message,
+      message: req.body.message || "",
       senderId: req.userData.id,
       recipientId: req.body.recipientId,
     };
+
+    // if (req.file) {
+    //   newChat.file = fileUrlGenerator(req, req.file.filename);
+    // }
 
     let files = [];
 
@@ -36,7 +40,7 @@ module.exports = async (req, res) => {
 
     const { data: dataChat, error: errorCreateChat } = await createChat(
       newChat,
-      files
+      files,
     );
     if (errorCreateChat) {
       const error = new Error(errorCreateChat);

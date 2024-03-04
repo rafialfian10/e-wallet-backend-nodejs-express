@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
 const chatController = require("../controllers/chatController");
-const { uploadSingleFile, uploadMultipleFile } = require("../pkg/middlewares/uploadFile");
+const { uploadMultipleFile } = require("../pkg/middlewares/uploadFile");
 const { userAuth } = require("../pkg/middlewares/auth");
 
 router.get("/chats", userAuth, chatController.getChats);

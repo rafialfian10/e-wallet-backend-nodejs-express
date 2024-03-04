@@ -1,10 +1,17 @@
 const jwt = require("jsonwebtoken");
 const path = require("path");
 // const fs = require("fs");
+const multer = require("multer");
 const siofu = require("socketio-file-upload");
 
-const { Users, Roles, Balances, Chats, Files } = require("../../database/models");
-const { uploadSingleFile, uploadMultipleFile } = require("../pkg/middlewares/uploadFile");
+const {
+  Users,
+  Roles,
+  Balances,
+  Chats,
+  Files,
+} = require("../../database/models");
+const { uploadMultipleFile } = require("../pkg/middlewares/uploadFile");
 const { fileUrlGenerator } = require("../pkg/helpers/imgUrlGenerator");
 
 // import sequelize operator => https://sequelize.org/master/manual/model-querying-basics.html#operators
@@ -22,7 +29,7 @@ const socketIo = (io) => {
     }
   });
 
-  io.on("connection", (socket) => {
+  io.sockets.on("connection", (socket) => {
     // get user connected id
     const userId = socket.handshake.query.id;
 
@@ -33,6 +40,16 @@ const socketIo = (io) => {
     var uploader = new siofu();
     uploader.dir = path.join(__dirname, "../../uploads/file-message");
     uploader.listen(socket);
+
+    // Do something when a file is saved:
+    uploader.on("saved", function (event) {
+      console.log("====================================", event.file);
+    });
+
+    // Error handler:
+    uploader.on("error", function (event) {
+      console.log("Error from uploader", event);
+    });
 
     // define listener on event load super admin contact
     socket.on("load super admin contact", async () => {
@@ -202,6 +219,7 @@ const socketIo = (io) => {
 
     // define listener on event send message
     socket.on("send message", async (payload) => {
+      console.log(payload);
       try {
         const token = socket.handshake.auth.token;
 
@@ -209,10 +227,10 @@ const socketIo = (io) => {
         const verified = jwt.verify(token._j, tokenKey);
 
         const senderId = verified.id; //id user
-        const { message, file, recipientId } = payload; // catch recipient id, message, file sent from client
+        const { message, files, recipientId } = payload; // catch recipient id, message, file sent from client
 
         // Event listener for when a file is saved
-        if (!file) {
+        if (files.length === 0) {
           await Chats.create({
             message,
             senderId,
@@ -223,13 +241,33 @@ const socketIo = (io) => {
             .to(connectedUser[recipientId])
             .emit("new message", recipientId);
         } else {
-          await Chats.create({
+          const createdChat = await Chats.create({
             message,
-            file,
             senderId,
             recipientId,
           });
 
+          let fileExtensions = [];
+
+          files.map((file) => {
+            let fileExtension = path.extname(file.name);
+            fileExtensions.push(fileExtension);
+          });
+
+          const fileExtension = fileExtensions[0];
+          const filename = `${Date.now()}_${Math.floor(
+            Math.random() * 1000
+          )}${fileExtension}`;
+
+          console.log(filename);
+
+          // if (files.length > 0) {
+          //   await Files.bulkCreate(
+          //     files.map((file) => ({ file: file.name, chatId: createdChat.id }))
+          //   );
+          // }
+
+          // Emit new message event
           io.to(socket.id)
             .to(connectedUser[recipientId])
             .emit("new message", recipientId);
@@ -245,6 +283,14 @@ const socketIo = (io) => {
         await Chats.destroy({
           where: {
             id: {
+              [Op.in]: ids,
+            },
+          },
+        });
+
+        await Files.destroy({
+          where: {
+            chatId: {
               [Op.in]: ids,
             },
           },

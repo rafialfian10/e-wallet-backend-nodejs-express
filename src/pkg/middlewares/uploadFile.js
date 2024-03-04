@@ -1,7 +1,6 @@
 const httpStatus = require("http-status");
 const path = require("path");
 const multer = require("multer");
-// --------------------------------------------------
 
 const diskStoragePhoto = multer.diskStorage({
   // konfigurasi lokasi penyimpanan file
@@ -22,7 +21,7 @@ const diskStorageFile = multer.diskStorage({
   },
   // konfigurasi penamaan file yang unik
   filename: function (req, file, cb) {
-    let fileName = `img-${new Date().getTime()}`;
+    let fileName = `file-${new Date().getTime()}`;
     cb(null, fileName + path.extname(file.originalname));
   },
 });

@@ -25,7 +25,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.SOCKET_CLIENT, // define client origin if both client and server have different origin
-    methods: ["GET", "POST", "DELETE"],
+    methods: ["GET", "POST"],
     allowedHeaders: [
       "Origin",
       "X-Requested-With",

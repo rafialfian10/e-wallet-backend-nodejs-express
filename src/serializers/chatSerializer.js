@@ -1,10 +1,10 @@
 const joi = require("joi");
 
-const { Chats, Files } = require("../../database/models");
+const { Chats } = require("../../database/models");
 
 exports.singleChatResponse = (chatData) => {
   const chat =
-  chatData instanceof Chats ? chatData.get({ plain: true }) : chatData;
+    chatData instanceof Chats ? chatData.get({ plain: true }) : chatData;
 
   return {
     id: chat.id,
@@ -25,7 +25,7 @@ exports.multipleChatResponse = (chatsData) => {
 
 exports.validateCreateChatRequest = (chatData) => {
   const schema = joi.object({
-    message: joi.string(),
+    message: joi.string().allow(""),
     file: joi.string(),
     senderId: joi.string().required(),
     recipientId: joi.string().required(),
