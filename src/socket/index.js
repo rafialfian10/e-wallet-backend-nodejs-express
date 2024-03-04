@@ -3,8 +3,8 @@ const path = require("path");
 // const fs = require("fs");
 const siofu = require("socketio-file-upload");
 
-const { Users, Roles, Balances, Chats } = require("../../database/models");
-const { uploadSingleFile } = require("../pkg/middlewares/uploadFile");
+const { Users, Roles, Balances, Chats, Files } = require("../../database/models");
+const { uploadSingleFile, uploadMultipleFile } = require("../pkg/middlewares/uploadFile");
 const { fileUrlGenerator } = require("../pkg/helpers/imgUrlGenerator");
 
 // import sequelize operator => https://sequelize.org/master/manual/model-querying-basics.html#operators
@@ -162,6 +162,11 @@ const socketIo = (io) => {
             },
           },
           include: [
+            {
+              model: Files,
+              as: "files",
+              attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+            },
             {
               model: Users,
               as: "recipient",

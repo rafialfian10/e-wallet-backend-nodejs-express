@@ -10,6 +10,11 @@ exports.getChats = async (offset = 0, limit = 30, filter = {}) => {
       where: filter,
       include: [
         {
+          model: Files,
+          as: "files",
+          attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+        },
+        {
           model: Users,
           as: "sender",
           attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
