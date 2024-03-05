@@ -14,18 +14,6 @@ const diskStoragePhoto = multer.diskStorage({
   },
 });
 
-const diskStorageFile = multer.diskStorage({
-  // konfigurasi lokasi penyimpanan file
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "../../../uploads/file-message"));
-  },
-  // konfigurasi penamaan file yang unik
-  filename: function (req, file, cb) {
-    let fileName = `file-${new Date().getTime()}`;
-    cb(null, fileName + path.extname(file.originalname));
-  },
-});
-
 const uploadPhoto = multer({
   storage: diskStoragePhoto,
   // limits: 8192000,
@@ -41,6 +29,40 @@ const uploadPhoto = multer({
     } else {
       cb(null, true);
     }
+  },
+});
+
+exports.uploadPhoto = async (req, res, next) => {
+  uploadPhoto.single("photo")(req, res, function (err) {
+    try {
+      if (err instanceof multer.MulterError) {
+        // A Multer error occurred when uploading.
+        throw err;
+      } else if (err) {
+        // An unknown error occurred when uploading.
+        throw err;
+      }
+
+      // Everything went fine.
+      next();
+    } catch (error) {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message,
+      });
+    }
+  });
+};
+
+const diskStorageFile = multer.diskStorage({
+  // konfigurasi lokasi penyimpanan file
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "../../../uploads/file-message"));
+  },
+  // konfigurasi penamaan file yang unik
+  filename: function (req, file, cb) {
+    let fileName = `file-${new Date().getTime()}`;
+    cb(null, fileName + path.extname(file.originalname));
   },
 });
 
@@ -73,28 +95,6 @@ const uploadFile = multer({
     }
   },
 });
-
-exports.uploadPhoto = async (req, res, next) => {
-  uploadPhoto.single("photo")(req, res, function (err) {
-    try {
-      if (err instanceof multer.MulterError) {
-        // A Multer error occurred when uploading.
-        throw err;
-      } else if (err) {
-        // An unknown error occurred when uploading.
-        throw err;
-      }
-
-      // Everything went fine.
-      next();
-    } catch (error) {
-      res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
-        status: httpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message,
-      });
-    }
-  });
-};
 
 exports.uploadSingleFile = async (req, res, next) => {
   uploadFile.single("file")(req, res, function (err) {

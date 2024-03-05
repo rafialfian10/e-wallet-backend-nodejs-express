@@ -1,8 +1,7 @@
 const jwt = require("jsonwebtoken");
 const path = require("path");
-// const fs = require("fs");
+const fs = require("fs");
 const multer = require("multer");
-const siofu = require("socketio-file-upload");
 
 const {
   Users,
@@ -11,8 +10,6 @@ const {
   Chats,
   Files,
 } = require("../../database/models");
-const { uploadMultipleFile } = require("../pkg/middlewares/uploadFile");
-const { fileUrlGenerator } = require("../pkg/helpers/imgUrlGenerator");
 
 // import sequelize operator => https://sequelize.org/master/manual/model-querying-basics.html#operators
 const { Op } = require("sequelize");
@@ -29,27 +26,28 @@ const socketIo = (io) => {
     }
   });
 
-  io.sockets.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     // get user connected id
-    const userId = socket.handshake.query.id;
+    const userId = socket.handshake.query.id; // return user id contoh 8f68fea8-347d-4885-83ef-9d7e5156106e
 
     // save to connectedUser
-    connectedUser[userId] = socket.id;
+    connectedUser[userId] = socket.id; // return NxzZJ_v8ECGAIGZIAAAB
+    // connectedUser[userId] = true;
 
-    // upload file
-    var uploader = new siofu();
-    uploader.dir = path.join(__dirname, "../../uploads/file-message");
-    uploader.listen(socket);
-
-    // Do something when a file is saved:
-    uploader.on("saved", function (event) {
-      console.log("====================================", event.file);
-    });
-
-    // Error handler:
-    uploader.on("error", function (event) {
-      console.log("Error from uploader", event);
-    });
+    try {
+      const user = await Users.findByPk(userId);
+      if (user) {
+        if (user.roleId === 1) {
+          io.emit("superAdminOnline", userId);
+        } else if (user.roleId === 2) {
+          io.emit("adminOnline", userId);
+        } else {
+          io.emit("userOnline", userId);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
     // define listener on event load super admin contact
     socket.on("load super admin contact", async () => {
@@ -71,7 +69,7 @@ const socketIo = (io) => {
             role_id: 1,
           },
           attributes: {
-            exclude: ["updatedAt", "deletedAt", "password"],
+            exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
           },
         });
 
@@ -101,7 +99,7 @@ const socketIo = (io) => {
             role_id: 2,
           },
           attributes: {
-            exclude: ["updatedAt", "deletedAt", "password"],
+            exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
           },
         });
 
@@ -142,7 +140,7 @@ const socketIo = (io) => {
             },
           ],
           attributes: {
-            exclude: ["updatedAt", "deletedAt", "password"],
+            exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
           },
         });
 
@@ -219,7 +217,6 @@ const socketIo = (io) => {
 
     // define listener on event send message
     socket.on("send message", async (payload) => {
-      console.log(payload);
       try {
         const token = socket.handshake.auth.token;
 
@@ -229,7 +226,6 @@ const socketIo = (io) => {
         const senderId = verified.id; //id user
         const { message, files, recipientId } = payload; // catch recipient id, message, file sent from client
 
-        // Event listener for when a file is saved
         if (files.length === 0) {
           await Chats.create({
             message,
@@ -241,25 +237,16 @@ const socketIo = (io) => {
             .to(connectedUser[recipientId])
             .emit("new message", recipientId);
         } else {
-          const createdChat = await Chats.create({
-            message,
-            senderId,
-            recipientId,
-          });
+          // let fileExtensions = []; // return [.jpg, .pdf]
 
-          let fileExtensions = [];
+          // files.map((file) => {
+          //   let fileExtension = path.extname(file.name);
+          //   fileExtensions.push(fileExtension);
+          // });
 
-          files.map((file) => {
-            let fileExtension = path.extname(file.name);
-            fileExtensions.push(fileExtension);
-          });
-
-          const fileExtension = fileExtensions[0];
-          const filename = `${Date.now()}_${Math.floor(
-            Math.random() * 1000
-          )}${fileExtension}`;
-
-          console.log(filename);
+          // const filename = `${Date.now()}_${Math.floor(
+          //   Math.random() * 1000
+          // )}${fileExtensions}`;
 
           // if (files.length > 0) {
           //   await Files.bulkCreate(
@@ -267,7 +254,12 @@ const socketIo = (io) => {
           //   );
           // }
 
-          // Emit new message event
+          await Chats.create({
+            message,
+            senderId,
+            recipientId,
+          });
+
           io.to(socket.id)
             .to(connectedUser[recipientId])
             .emit("new message", recipientId);
@@ -302,21 +294,24 @@ const socketIo = (io) => {
       }
     });
 
-    socket.on("disconnect", () => {
-      console.log("client disconnect");
+    socket.on("disconnect", async () => {
+      delete connectedUser[userId];
+      console.log(`User with id ${userId} disconnected`);
+
+      try {
+        const user = await Users.findByPk(userId);
+        if (user.roleId === 1) {
+          io.emit("superAdminOffline", userId);
+        } else if (user.roleId === 2) {
+          io.emit("adminOffline", userId);
+        } else {
+          io.emit("userOffline", userId);
+        }
+      } catch (error) {
+        console.log(error);
+      }
     });
   });
 };
 
 module.exports = socketIo;
-
-// {
-//   fieldname: 'photo',
-//   originalname: 'Raff.jpg',
-//   encoding: '7bit',
-//   mimetype: 'image/jpeg',
-//   destination: 'D:\\projects\\project-nutech-e-wallet\\server\\uploads\\photo',
-//   filename: 'img-1708902584409.jpg',
-//   path: 'D:\\projects\\project-nutech-e-wallet\\server\\uploads\\photo\\img-1708902584409.jpg',
-//   size: 526258
-// }

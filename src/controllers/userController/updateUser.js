@@ -13,7 +13,7 @@ const {
   successResponse,
   errorResponse,
 } = require("../../serializers/responseSerializer");
-const { photoUrlGenerator}  = require("../../pkg/helpers/imgUrlGenerator");
+const { photoUrlGenerator }  = require("../../pkg/helpers/fileUrlGenerator");
 
 module.exports = async (req, res) => {
   try {

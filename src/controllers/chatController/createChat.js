@@ -9,7 +9,7 @@ const {
   successResponse,
   errorResponse,
 } = require("../../serializers/responseSerializer");
-const { fileUrlGenerator } = require("../../pkg/helpers/imgUrlGenerator");
+const { fileUrlGenerator } = require("../../pkg/helpers/fileUrlGenerator");
 
 module.exports = async (req, res) => {
   try {
