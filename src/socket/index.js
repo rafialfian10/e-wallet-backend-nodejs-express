@@ -13,6 +13,7 @@ const {
 
 // import sequelize operator => https://sequelize.org/master/manual/model-querying-basics.html#operators
 const { Op } = require("sequelize");
+
 const connectedUser = {};
 
 const socketIo = (io) => {
@@ -28,21 +29,20 @@ const socketIo = (io) => {
 
   io.on("connection", async (socket) => {
     // get user connected id
-    const userId = socket.handshake.query.id; // return user id contoh 8f68fea8-347d-4885-83ef-9d7e5156106e
+    const userId = socket.handshake.query.id;
 
     // save to connectedUser
-    connectedUser[userId] = socket.id; // return NxzZJ_v8ECGAIGZIAAAB
-    // connectedUser[userId] = true;
+    connectedUser[userId] = socket.id;
 
     try {
       const user = await Users.findByPk(userId);
       if (user) {
         if (user.roleId === 1) {
-          io.emit("superAdminOnline", userId);
+          io.emit("super admin online", userId);
         } else if (user.roleId === 2) {
-          io.emit("adminOnline", userId);
-        } else {
-          io.emit("userOnline", userId);
+          io.emit("admin online", userId);
+        } else if (user.roleId === 3) {
+          io.emit("user online", userId);
         }
       }
     } catch (error) {
@@ -199,13 +199,7 @@ const socketIo = (io) => {
           ],
           order: [["createdAt", "ASC"]],
           attributes: {
-            exclude: [
-              "createdAt",
-              "updatedAt",
-              "deletedAt",
-              "recipientId",
-              "senderId",
-            ],
+            exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
           },
         });
 
@@ -231,6 +225,11 @@ const socketIo = (io) => {
             message,
             senderId,
             recipientId,
+          });
+
+          io.to(connectedUser[recipientId]).emit("notification", {
+            senderId,
+            message,
           });
 
           io.to(socket.id)
@@ -262,7 +261,7 @@ const socketIo = (io) => {
 
           io.to(socket.id)
             .to(connectedUser[recipientId])
-            .emit("new message", recipientId);
+            .emit("new message", senderId, recipientId);
         }
       } catch (error) {
         console.log(error);
@@ -301,11 +300,11 @@ const socketIo = (io) => {
       try {
         const user = await Users.findByPk(userId);
         if (user.roleId === 1) {
-          io.emit("superAdminOffline", userId);
+          io.emit("super admin offline", userId);
         } else if (user.roleId === 2) {
-          io.emit("adminOffline", userId);
-        } else {
-          io.emit("userOffline", userId);
+          io.emit("admin offline", userId);
+        } else if (user.roleId === 3) {
+          io.emit("user offline", userId);
         }
       } catch (error) {
         console.log(error);

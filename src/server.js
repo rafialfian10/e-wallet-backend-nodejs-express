@@ -10,7 +10,7 @@ const customLogger = require("./pkg/middlewares/logger");
 // socket io
 const http = require("http");
 const { Server } = require("socket.io");
-var socketiofileupload = require("socketio-file-upload"); 
+const socketiofileupload = require("socketio-file-upload"); 
 
 require("dotenv").config(); // read environment variable from .env file
 
