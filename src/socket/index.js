@@ -140,7 +140,7 @@ const socketIo = (io) => {
             },
           ],
           attributes: {
-            exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
+            exclude: ["updatedAt", "deletedAt", "password"],
           },
         });
 
@@ -218,11 +218,12 @@ const socketIo = (io) => {
         const verified = jwt.verify(token._j, tokenKey);
 
         const senderId = verified.id; //id user
-        const { message, files, recipientId } = payload; // catch recipient id, message, file sent from client
+        const { message, files, notification, recipientId } = payload; // catch recipient id, message, file sent from client
 
         if (files.length === 0) {
           await Chats.create({
             message,
+            notification: senderId,
             senderId,
             recipientId,
           });
@@ -255,6 +256,8 @@ const socketIo = (io) => {
 
           await Chats.create({
             message,
+            notification,
+            files,
             senderId,
             recipientId,
           });
@@ -268,7 +271,7 @@ const socketIo = (io) => {
       }
     });
 
-    // define listener on event send message
+    // define listener on event delete message
     socket.on("delete messages", async (ids) => {
       try {
         await Chats.destroy({
@@ -288,6 +291,28 @@ const socketIo = (io) => {
         });
 
         io.emit("messages deleted", ids);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    // define listener on event delete notification
+    socket.on("delete notification", async (payloads) => {
+      try {
+        for (const payload of payloads) {
+          const { id, notification } = payload;
+          await Chats.update(
+            { notification: null },
+            {
+              where: {
+                id: id,
+                // notification: notification
+              },
+            }
+          );
+        }
+
+        io.emit("notification deleted", id);
       } catch (error) {
         console.log(error);
       }

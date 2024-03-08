@@ -33,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
   Chats.init(
     {
       message: DataTypes.TEXT,
+      notification: DataTypes.STRING,
       senderId: {
         type: DataTypes.UUID,
         allowNull: false,

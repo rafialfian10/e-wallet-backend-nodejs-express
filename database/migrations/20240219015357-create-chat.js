@@ -13,6 +13,9 @@ module.exports = {
       message: {
         type: Sequelize.TEXT,
       },
+      notification: {
+        type: Sequelize.STRING,
+      },
       sender_id: {
         type: Sequelize.UUID,
         references: {
