@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const path = require("path");
-const fs = require("fs");
 const multer = require("multer");
+const fs = require("fs");
 
 const {
   Users,
@@ -13,8 +13,24 @@ const {
 
 // import sequelize operator => https://sequelize.org/master/manual/model-querying-basics.html#operators
 const { Op } = require("sequelize");
+const { log } = require("console");
 
 const connectedUser = {};
+
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, path.join(__dirname, "../../../uploads/photo"));
+//   },
+//   filename: function (req, file, cb) {
+//     let fileName = `file-${new Date().getTime()}`;
+//     cb(null, fileName + path.extname(file.originalname));
+//   },
+// });
+
+// const upload = multer({
+//   storage: storage,
+//   limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
+// });
 
 const socketIo = (io) => {
   // create middlewares before connection event
@@ -50,9 +66,9 @@ const socketIo = (io) => {
     }
 
     // define listener on event load super admin contact
-    socket.on("load super admin contact", async () => {
+    socket.on("load super admins contact", async () => {
       try {
-        const superAdminContact = await Users.findOne({
+        const superAdminContacts = await Users.findAll({
           include: [
             {
               model: Roles,
@@ -63,6 +79,20 @@ const socketIo = (io) => {
               model: Balances,
               as: "balance",
               attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
+            },
+            {
+              model: Chats,
+              as: "recipientMessage",
+              attributes: {
+                exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
+              },
+            },
+            {
+              model: Chats,
+              as: "senderMessage",
+              attributes: {
+                exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
+              },
             },
           ],
           where: {
@@ -73,16 +103,18 @@ const socketIo = (io) => {
           },
         });
 
-        socket.emit("super admin contact", superAdminContact);
+        superAdminContacts = JSON.parse(JSON.stringify(superAdminContacts));
+
+        socket.emit("super admins contact", superAdminContacts);
       } catch (err) {
         console.log(err);
       }
     });
 
     // define listener on event load admin contact
-    socket.on("load admin contact", async () => {
+    socket.on("load admins contact", async () => {
       try {
-        const adminContact = await Users.findOne({
+        const adminContacts = await Users.findAll({
           include: [
             {
               model: Roles,
@@ -94,6 +126,20 @@ const socketIo = (io) => {
               as: "balance",
               attributes: { exclude: ["createdAt", "updatedAt", "deletedAt"] },
             },
+            {
+              model: Chats,
+              as: "recipientMessage",
+              attributes: {
+                exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
+              },
+            },
+            {
+              model: Chats,
+              as: "senderMessage",
+              attributes: {
+                exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
+              },
+            },
           ],
           where: {
             role_id: 2,
@@ -103,7 +149,9 @@ const socketIo = (io) => {
           },
         });
 
-        socket.emit("admin contact", adminContact);
+        // adminContacts = JSON.parse(JSON.stringify(adminContacts));
+
+        socket.emit("admins contact", adminContacts);
       } catch (err) {
         console.log(err);
       }
@@ -218,7 +266,7 @@ const socketIo = (io) => {
         const verified = jwt.verify(token._j, tokenKey);
 
         const senderId = verified.id; //id user
-        const { message, files, notification, recipientId } = payload; // catch recipient id, message, file sent from client
+        const { message, files, recipientId } = payload; // catch recipient id, message, file sent from client
 
         if (files.length === 0) {
           await Chats.create({
@@ -235,31 +283,46 @@ const socketIo = (io) => {
 
           io.to(socket.id)
             .to(connectedUser[recipientId])
-            .emit("new message", recipientId);
+            .emit("new message", recipientId, senderId);
         } else {
-          // let fileExtensions = []; // return [.jpg, .pdf]
+          let fileUrls = [];
 
-          // files.map((file) => {
-          //   let fileExtension = path.extname(file.name);
-          //   fileExtensions.push(fileExtension);
-          // });
+          //     for (const file of files) {
+          //   const filePath = path.join(__dirname, `../../../uploads/${file.name}`);
 
-          // const filename = `${Date.now()}_${Math.floor(
-          //   Math.random() * 1000
-          // )}${fileExtensions}`;
-
-          // if (files.length > 0) {
-          //   await Files.bulkCreate(
-          //     files.map((file) => ({ file: file.name, chatId: createdChat.id }))
-          //   );
+          //   // Simpan file ke direktori yang ditentukan
+          //   await new Promise((resolve, reject) => {
+          //     fs.writeFile(filePath, file.data, (err) => {
+          //       if (err) reject(err);
+          //       else {
+          //         fileUrls.push({ name: file.name, path: filePath });
+          //         resolve();
+          //       }
+          //     });
+          //   });
           // }
+
+          // console.log("==========================================", fileUrls);
 
           await Chats.create({
             message,
-            notification,
-            files,
+            notification: senderId,
             senderId,
             recipientId,
+          });
+
+          // if (fileUrls.length > 0) {
+          //   await Files.bulkCreate(
+          //     fileUrls.map((file) => ({
+          //       file: file.name,
+          //       chatId: createdChat.id,
+          //     }))
+          //   );
+          // }
+
+          io.to(connectedUser[recipientId]).emit("notification", {
+            senderId,
+            message,
           });
 
           io.to(socket.id)
@@ -300,19 +363,18 @@ const socketIo = (io) => {
     socket.on("delete notification", async (payloads) => {
       try {
         for (const payload of payloads) {
-          const { id, notification } = payload;
+          const { id } = payload;
           await Chats.update(
             { notification: null },
             {
               where: {
                 id: id,
-                // notification: notification
               },
             }
           );
         }
 
-        io.emit("notification deleted", id);
+        io.emit("notification deleted", payloads);
       } catch (error) {
         console.log(error);
       }
