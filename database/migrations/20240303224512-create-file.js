@@ -10,9 +10,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      file: {
-        type: Sequelize.STRING,
-      },
       chat_id: {
         type: Sequelize.INTEGER,
         references: {
@@ -21,6 +18,18 @@ module.exports = {
         },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
+      },
+      file_path: {
+        type: Sequelize.STRING,
+      },
+      file_name: {
+        type: Sequelize.STRING,
+      },
+      file_type: {
+        type: Sequelize.STRING,
+      },
+      file_size: {
+        type: Sequelize.INTEGER,
       },
       created_at: {
         allowNull: false,

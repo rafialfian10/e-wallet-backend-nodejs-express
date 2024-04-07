@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const path = require("path");
-const multer = require("multer");
 const fs = require("fs");
+// const SocketIOFileUploadServer = require("socketio-file-upload");
 
 const {
   Users,
@@ -13,24 +13,8 @@ const {
 
 // import sequelize operator => https://sequelize.org/master/manual/model-querying-basics.html#operators
 const { Op } = require("sequelize");
-const { log } = require("console");
 
 const connectedUser = {};
-
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, path.join(__dirname, "../../../uploads/photo"));
-//   },
-//   filename: function (req, file, cb) {
-//     let fileName = `file-${new Date().getTime()}`;
-//     cb(null, fileName + path.extname(file.originalname));
-//   },
-// });
-
-// const upload = multer({
-//   storage: storage,
-//   limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
-// });
 
 const socketIo = (io) => {
   // create middlewares before connection event
@@ -64,6 +48,13 @@ const socketIo = (io) => {
     } catch (error) {
       console.log(error);
     }
+
+    // Initialize SocketIOFileUploadServer
+    // const uploader = new SocketIOFileUploadServer();
+    // uploader.dir = path.join(__dirname, "../../uploads/file-message");
+    // uploader.on('error', (err) => {
+    //   console.error('Error:', err);
+    // });
 
     // define listener on event load super admin contact
     socket.on("load super admins contact", async () => {
@@ -102,8 +93,6 @@ const socketIo = (io) => {
             exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
           },
         });
-
-        superAdminContacts = JSON.parse(JSON.stringify(superAdminContacts));
 
         socket.emit("super admins contact", superAdminContacts);
       } catch (err) {
@@ -148,8 +137,6 @@ const socketIo = (io) => {
             exclude: ["createdAt", "updatedAt", "deletedAt", "password"],
           },
         });
-
-        // adminContacts = JSON.parse(JSON.stringify(adminContacts));
 
         socket.emit("admins contact", adminContacts);
       } catch (err) {
@@ -285,40 +272,63 @@ const socketIo = (io) => {
             .to(connectedUser[recipientId])
             .emit("new message", recipientId, senderId);
         } else {
-          let fileUrls = [];
+          const uploadedFiles = [];
 
-          //     for (const file of files) {
-          //   const filePath = path.join(__dirname, `../../../uploads/${file.name}`);
+          for (const file of files) {
+            const fileName = `file-${new Date().getTime()}${path.extname(
+              file.fileName
+            )}`;
+            const filePath = path.join(
+              __dirname,
+              "../../uploads/file-message",
+              fileName
+            );
 
-          //   // Simpan file ke direktori yang ditentukan
-          //   await new Promise((resolve, reject) => {
-          //     fs.writeFile(filePath, file.data, (err) => {
-          //       if (err) reject(err);
-          //       else {
-          //         fileUrls.push({ name: file.name, path: filePath });
-          //         resolve();
-          //       }
-          //     });
-          //   });
-          // }
+            // Use fs.writeFile to save the file to the destination directory
+            try {
+              // Write the buffer to a file with base64 coding
+              fs.writeFileSync(filePath, file.base64, { encoding: "base64" });
 
-          // console.log("==========================================", fileUrls);
+              const fileUrl = `http://${socket.handshake.headers.host}/static/file-message/${fileName}`;
+              uploadedFiles.push({
+                filePath: fileUrl,
+                fileName: file.fileName,
+                fileType: file.fileType,
+                fileSize: file.fileSize,
+              });
+            } catch (err) {
+              console.error("Error uploading file:", err);
+            }
+          }
 
-          await Chats.create({
+          const createdChat = await Chats.create({
             message,
             notification: senderId,
             senderId,
             recipientId,
           });
 
-          // if (fileUrls.length > 0) {
-          //   await Files.bulkCreate(
-          //     fileUrls.map((file) => ({
-          //       file: file.name,
-          //       chatId: createdChat.id,
-          //     }))
-          //   );
-          // }
+          if (uploadedFiles.length > 0) {
+            await Files.bulkCreate(
+              uploadedFiles.map((file) => ({
+                chatId: createdChat.id,
+                filePath: file.filePath,
+                fileName: file.fileName,
+                fileType: file.fileType,
+                fileSize: file.fileSize,
+              }))
+            );
+            // const fileRecords = await Files.bulkCreate(
+            //   uploadedFiles.map((file) => ({
+            //     file: file.file,
+            //     chatId: createdChat.id,
+            //   }))
+            // );
+
+            // fileRecords.forEach((record, index) => {
+            //   uploadedFiles[index].chatId = record.chatId;
+            // });
+          }
 
           io.to(connectedUser[recipientId]).emit("notification", {
             senderId,

@@ -10,18 +10,16 @@ const customLogger = require("./pkg/middlewares/logger");
 // socket io
 const http = require("http");
 const { Server } = require("socket.io");
-const socketiofileupload = require("socketio-file-upload"); 
+var SocketIOFileUploadServer = require("socketio-file-upload");
 
 require("dotenv").config(); // read environment variable from .env file
 
 // create instance of express
 const app = express();
 
-// socket io file upload
-app.use(socketiofileupload.router)
-
-// add after app initialization
+// Inisialisasi server HTTP
 const server = http.createServer(app);
+
 const io = new Server(server, {
   cors: {
     origin: process.env.SOCKET_CLIENT, // define client origin if both client and server have different origin
@@ -33,7 +31,17 @@ const io = new Server(server, {
       "Authorization",
     ],
   },
+  maxHttpBufferSize: 1e8 // 100mb
 });
+
+// Inisialisasi SocketIOFileUploadServer
+const uploader = new SocketIOFileUploadServer();
+
+// Mengatur direktori untuk menyimpan file yang diunggah
+uploader.dir = path.join(__dirname, "../uploads");
+
+// Memastikan Express app Anda adalah server yang digunakan untuk menghandle upload file
+uploader.listen(server);
 
 // import socket function and call with parameter io
 require("../src/socket")(io);

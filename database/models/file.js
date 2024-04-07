@@ -18,11 +18,14 @@ module.exports = (sequelize, DataTypes) => {
   }
   Files.init(
     {
-      file: DataTypes.STRING,
       chatId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
+      filePath: DataTypes.STRING,
+      fileName: DataTypes.STRING,
+      fileType: DataTypes.STRING,
+      fileSize: DataTypes.INTEGER,
     },
     {
       sequelize,
