@@ -4,7 +4,7 @@ const cors = require("cors");
 
 const path = require("path");
 const router = require("./routes");
-const { redisInit } = require("../config/redis");
+// const { redisInit } = require("../config/redis");
 const customLogger = require("./pkg/middlewares/logger");
 
 // socket io
@@ -21,6 +21,7 @@ const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
+  
   cors: {
     origin: process.env.SOCKET_CLIENT, // define client origin if both client and server have different origin
     methods: ["GET", "POST"],
