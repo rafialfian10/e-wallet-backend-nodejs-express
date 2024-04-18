@@ -1,10 +1,11 @@
+require("dotenv").config(); // read environment variable from .env file
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 
 const path = require("path");
 const router = require("./routes");
-// const { redisInit } = require("../config/redis");
+const { redisInit } = require("../config/redis");
 const customLogger = require("./pkg/middlewares/logger");
 
 // socket io
@@ -12,7 +13,6 @@ const http = require("http");
 const { Server } = require("socket.io");
 var SocketIOFileUploadServer = require("socketio-file-upload");
 
-require("dotenv").config(); // read environment variable from .env file
 
 // create instance of express
 const app = express();
@@ -65,7 +65,7 @@ app.use(
 );
 
 // connect to redis server
-// redisInit();
+redisInit();
 
 // create logger instance
 const logger = morgan("dev");

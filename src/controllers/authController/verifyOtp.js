@@ -12,8 +12,8 @@ const {
   successResponse,
   errorResponse,
 } = require("../../serializers/responseSerializer");
-const { getRedisValue } = require("../../pkg/helpers/redis");
 const { comparePassword } = require("../../pkg/helpers/bcrypt");
+const { getRedisValue } = require("../../pkg/helpers/redis");
 
 module.exports = async (req, res) => {
   try {
@@ -68,11 +68,11 @@ module.exports = async (req, res) => {
 
     // send response
     successResponse({
-      res: res,
+      response: res,
       status: httpStatus.OK,
       data: singleUserResponse(updatedUser),
     });
   } catch (error) {
-    errorResponse({ res: res, error: error });
+    errorResponse({ response: res, error: error });
   }
 };

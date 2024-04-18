@@ -1,23 +1,27 @@
-// const { createClient } = require("redis");
+const { createClient } = require("redis");
 
-// let redisClient;
-// const redisUrl = `redis://:${process.env.REDIS_PASSWORD}@${process.env.REDIS_URL}:${process.env.REDIS_PORT}/0`;
+/* The above code connects to localhost on port 6379. To connect to a different host or port, use a connection string in the format 
+redis[s]://[[username][:password]@][host][:port][/db-number]:
+*/
 
-// try {
-//   redisClient = createClient({
-//     url: redisUrl,
-//   });
-// } catch (error) {
-//   console.error("Invalid Redis URL !");
-// }
+let redisClient;
+const redisUrl = `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`;
 
-// exports.client = redisClient;
+try {
+  redisClient = createClient({
+    url: redisUrl,
+  });
+} catch (error) {
+  console.error("Invalid Redis URL !");
+}
 
-// exports.redisInit = async () => {
-//   try {
-//     await redisClient.connect();
-//     console.log("Redis connected successfully !");
-//   } catch (error) {
-//     console.log("Redis connection error", error);
-//   }
-// };
+exports.client = redisClient;
+
+exports.redisInit = async () => {
+  try {
+    await redisClient.connect();
+    console.log("Redis connected successfully !");
+  } catch (error) {
+    console.log("Redis connection error", error);
+  }
+};
