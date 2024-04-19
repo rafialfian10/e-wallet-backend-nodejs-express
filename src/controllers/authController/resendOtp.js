@@ -36,7 +36,7 @@ module.exports = async (req, res) => {
     }
 
     // generate OTP
-    const otp = otpCodeGenerator(4);
+    const otp = otpCodeGenerator(6);
     const hashedOtp = await hashPassword(otp, 11);
 
     // store hashed otp in redis

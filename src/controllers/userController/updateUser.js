@@ -13,10 +13,11 @@ const {
   successResponse,
   errorResponse,
 } = require("../../serializers/responseSerializer");
+const { hashPassword } = require("../../pkg/helpers/bcrypt");
 const { photoUrlGenerator }  = require("../../pkg/helpers/fileUrlGenerator");
 
 module.exports = async (req, res) => {
-  try {
+  try { 
     const error = validateUpdateUserRequest(req.body);
     if (error) {
       const errors = new Error(error);
@@ -98,7 +99,7 @@ module.exports = async (req, res) => {
       req.body.pin !== undefined &&
       req.body.pin !== user.pin
     ) {
-      user.pin = req.body.pin;
+      user.pin = await hashPassword(req.body.pin, 6);
     }
 
     // update role

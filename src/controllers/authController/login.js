@@ -42,11 +42,11 @@ module.exports = async (req, res) => {
       throw error;
     }
 
-    // if (user.isEmailVerified === false) {
-    //   const error = new Error("Email has not been verified");
-    //   error.status = httpStatus.BAD_REQUEST;
-    //   throw error;
-    // }
+    if (user.isEmailVerified === false) {
+      const error = new Error("Email has not been verified");
+      error.status = httpStatus.UNAUTHORIZED;
+      throw error;
+    }
 
     const token = jwt.sign(
       {

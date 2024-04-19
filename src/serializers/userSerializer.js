@@ -39,10 +39,6 @@ exports.validateCreateUserRequest = (userData) => {
       .string()
       .regex(/^\d{10,13}$/)
       .required(),
-    pin: joi
-      .string()
-      .pattern(/^[0-9]{6}$/)
-      .required(),
   });
 
   try {
@@ -63,11 +59,12 @@ exports.validateUpdateUserRequest = (userData) => {
     password: joi.string(),
     phone: joi
       .string()
-      .allow(null, "")
       .regex(/^\d{11,13}$/),
     gender: joi.string().allow(null, ""),
     address: joi.string().allow(null, ""),
-    pin: joi.string().pattern(/^[0-9]{6}$/),
+    pin: joi
+      .string()
+      .pattern(/^[0-9]{6}$/).required(),
     roleId: joi.number(),
   });
 
@@ -115,7 +112,7 @@ exports.validateResendOTPRequest = (userData) => {
   }
 };
 
-exports.validateUserVerificationRequest = (userData) => {
+exports.validateVerifyOtpRequest = (userData) => {
   const schema = joi.object({
     email: joi.string().email().required(),
     otp: joi.number().required(),

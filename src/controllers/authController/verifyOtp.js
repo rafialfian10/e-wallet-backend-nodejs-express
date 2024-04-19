@@ -6,7 +6,7 @@ const {
 } = require("../../repositories/userRepository");
 const {
   singleUserResponse,
-  validateUserVerificationRequest,
+  validateVerifyOtpRequest,
 } = require("../../serializers/userSerializer");
 const {
   successResponse,
@@ -18,7 +18,7 @@ const { getRedisValue } = require("../../pkg/helpers/redis");
 module.exports = async (req, res) => {
   try {
     // validate request data
-    const error = validateUserVerificationRequest(req.body);
+    const error = validateVerifyOtpRequest(req.body);
     if (error) {
       const errors = new Error(error);
       errors.status = httpStatus.BAD_REQUEST;

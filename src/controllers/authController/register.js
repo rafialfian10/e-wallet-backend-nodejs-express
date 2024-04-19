@@ -27,7 +27,6 @@ module.exports = async (req, res) => {
       email: req.body.email,
       password: await hashPassword(req.body.password, 11),
       phone: req.body.phone,
-      pin: req.body.pin,
     };
 
     /**
@@ -81,7 +80,7 @@ module.exports = async (req, res) => {
     }
 
     // generate otp code
-    const otp = otpCodeGenerator(4);
+    const otp = otpCodeGenerator(6);
     const hashedOtp = await hashPassword(otp, 11);
 
     // store hashed otp in redis for 5 minutes
