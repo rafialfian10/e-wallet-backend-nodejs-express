@@ -64,7 +64,7 @@ exports.validateUpdateUserRequest = (userData) => {
     address: joi.string().allow(null, ""),
     pin: joi
       .string()
-      .pattern(/^[0-9]{6}$/).required(),
+      .pattern(/^[0-9]{6}$/),
     roleId: joi.number(),
   });
 
