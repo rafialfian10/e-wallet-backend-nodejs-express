@@ -16,7 +16,10 @@ exports.getRedisValue = async (key) => {
 
   try {
     const value = await client.get(key);
-    response.data = value;
+    if (value !== null) {
+      const ttl = await client.ttl(key);
+      response.data = { value, ttl };
+    }
   } catch (error) {
     console.log("Get Value error : ", error);
     response.error = error;

@@ -7,10 +7,11 @@ exports.successResponse = ({
   limit = 10,
   page,
   data,
+  message,
 }) => {
   response.status(status || httpStatus.OK).json({
     status: status || httpStatus.OK,
-    message: "OK",
+    message: message ? message : "OK",
     totalData: totalData,
     totalPage: Math.ceil(totalData / limit) || 1,
     currentPage: parseInt(page) || 1,
