@@ -13,6 +13,7 @@ const {
 
 // import sequelize operator => https://sequelize.org/master/manual/model-querying-basics.html#operators
 const { Op } = require("sequelize");
+const { duration } = require("moment-timezone");
 
 const connectedUser = {};
 
@@ -295,6 +296,7 @@ const socketIo = (io) => {
                 fileName: file.fileName,
                 fileType: file.fileType,
                 fileSize: file.fileSize,
+                duration: file.duration,
               });
             } catch (err) {
               console.error("Error uploading file:", err);
@@ -316,18 +318,9 @@ const socketIo = (io) => {
                 fileName: file.fileName,
                 fileType: file.fileType,
                 fileSize: file.fileSize,
+                duration: file.duration,
               }))
             );
-            // const fileRecords = await Files.bulkCreate(
-            //   uploadedFiles.map((file) => ({
-            //     file: file.file,
-            //     chatId: createdChat.id,
-            //   }))
-            // );
-
-            // fileRecords.forEach((record, index) => {
-            //   uploadedFiles[index].chatId = record.chatId;
-            // });
           }
 
           io.to(connectedUser[recipientId]).emit("notification", {
