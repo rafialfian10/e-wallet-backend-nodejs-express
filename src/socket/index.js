@@ -297,6 +297,7 @@ const socketIo = (io) => {
                 fileType: file.fileType,
                 fileSize: file.fileSize,
                 duration: file.duration,
+                type: file.type,
               });
             } catch (err) {
               console.error("Error uploading file:", err);
@@ -319,6 +320,7 @@ const socketIo = (io) => {
                 fileType: file.fileType,
                 fileSize: file.fileSize,
                 duration: file.duration,
+                type: file.type,
               }))
             );
           }

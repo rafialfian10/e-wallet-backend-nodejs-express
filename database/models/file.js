@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       fileType: DataTypes.STRING,
       fileSize: DataTypes.INTEGER,
       duration: DataTypes.INTEGER,
+      type: DataTypes.STRING,
     },
     {
       sequelize,
