@@ -34,7 +34,7 @@ module.exports = {
       duration: {
         type: Sequelize.INTEGER,
       },
-      type: {
+      extension: {
         type: Sequelize.STRING,
       },
       created_at: {
