@@ -12,8 +12,7 @@ const {
 } = require("../../database/models");
 
 // import sequelize operator => https://sequelize.org/master/manual/model-querying-basics.html#operators
-const { Op } = require("sequelize");
-const { duration } = require("moment-timezone");
+const { Op, where } = require("sequelize");
 
 const connectedUser = {};
 
@@ -120,14 +119,14 @@ const socketIo = (io) => {
               model: Chats,
               as: "recipientMessage",
               attributes: {
-                exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
+                exclude: ["updatedAt", "deletedAt"],
               },
             },
             {
               model: Chats,
               as: "senderMessage",
               attributes: {
-                exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
+                exclude: ["updatedAt", "deletedAt"],
               },
             },
           ],
@@ -179,7 +178,6 @@ const socketIo = (io) => {
             exclude: ["updatedAt", "deletedAt", "password"],
           },
         });
-
         userContacts = JSON.parse(JSON.stringify(userContacts));
         // userContacts = userContacts.map((item) => ({
         //   ...item,
