@@ -163,14 +163,14 @@ const socketIo = (io) => {
               model: Chats,
               as: "recipientMessage",
               attributes: {
-                exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
+                exclude: ["updatedAt", "deletedAt"],
               },
             },
             {
               model: Chats,
               as: "senderMessage",
               attributes: {
-                exclude: ["updatedAt", "deletedAt", "recipientId", "senderId"],
+                exclude: ["updatedAt", "deletedAt"],
               },
             },
           ],
