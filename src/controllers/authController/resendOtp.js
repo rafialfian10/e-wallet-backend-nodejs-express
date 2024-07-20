@@ -66,8 +66,8 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "OTP successfully sent to user's email",
       data: redisGetVal,
-      message: "OTP successfully sent to user's email"
     });
   } catch (error) {
     errorResponse({

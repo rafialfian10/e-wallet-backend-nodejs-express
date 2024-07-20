@@ -66,6 +66,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "Login successfully",
       data: { id: user.id, token: token },
     });
   } catch (error) {

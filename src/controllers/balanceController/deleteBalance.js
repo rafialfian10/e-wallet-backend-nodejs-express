@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "Balance successfully deleted",
       data: singleBalanceResponse(balanceDeleted),
     });
   } catch (error) {

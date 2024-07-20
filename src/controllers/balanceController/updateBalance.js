@@ -57,6 +57,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "Balance successfully updated",
       data: singleBalanceResponse(balanceUpdated),
     });
   } catch (error) {

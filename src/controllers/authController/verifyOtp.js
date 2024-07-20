@@ -40,12 +40,14 @@ module.exports = async (req, res) => {
     }
 
     // get hashed otp from redis
-    const { data: hashedOtp, error: errGetOtp } = await getRedisValue(
+    const { data: redisData, error: errGetOtp } = await getRedisValue(
       req.body.email
     );
     if (errGetOtp) {
       throw new Error(errGetOtp);
     }
+
+    const hashedOtp = redisData ? redisData.value : null;
 
     // validate otp token
     if (!hashedOtp) {
@@ -70,6 +72,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "Email has been verified",
       data: singleUserResponse(updatedUser),
     });
   } catch (error) {

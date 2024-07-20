@@ -102,6 +102,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.CREATED,
+      message: "User successfully registered",
       data: userRegistered,
     });
   } catch (error) {

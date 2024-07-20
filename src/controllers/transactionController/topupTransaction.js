@@ -60,6 +60,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "Topup successfully",
       data: singleTransactionResponse(transaction),
     });
   } catch (error) {

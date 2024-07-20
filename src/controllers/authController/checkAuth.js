@@ -19,6 +19,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "User found",
       data: singleUserResponse(user),
     });
   } catch (error) {

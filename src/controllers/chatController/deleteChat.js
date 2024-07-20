@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "Chat successfully deleted",
       data: singleChatResponse(chatDeleted),
     });
   } catch (error) {

@@ -58,6 +58,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message  : "Chat successfully created",
       data: singleChatResponse(chat),
     });
   } catch (error) {

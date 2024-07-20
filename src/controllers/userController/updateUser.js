@@ -134,6 +134,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "User successfully updated",
       data: singleUserResponse(userUpdated),
     });
   } catch (error) {

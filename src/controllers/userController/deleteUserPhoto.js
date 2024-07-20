@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "User photo successfully deleted",
       data: singleUserResponse(user),
     });
   } catch (error) {

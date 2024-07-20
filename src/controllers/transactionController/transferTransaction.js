@@ -64,6 +64,7 @@ module.exports = async (req, res) => {
     successResponse({
       response: res,
       status: httpStatus.OK,
+      message: "Transfer successfully",
       data: singleTransactionResponse(transaction),
     });
   } catch (error) {
